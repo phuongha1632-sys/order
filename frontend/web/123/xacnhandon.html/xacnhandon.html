@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <h1>xac nhan don</h1>
+    <div id="place-sidebar"><!--vtri nut sidebar --></div>
+
+    <!-- chen file sidebar.hmtl vao  -->
+    <script>
+      const sourcefile = "../sidebar.html";
+      const placeid = "place-sidebar";
+
+      fetch(sourcefile)
+        .then((response) => response.text())
+        .then((data) => {
+          document.getElementById(placeid).innerHTML = data;
+
+          const button_sidebar = document.getElementById("menu_button");
+          const content = document.getElementById("container");
+          const backdrop = document.getElementById("sidebar_backdrop");
+          const close = document.querySelector(".sidebar-close");
+
+          // mở/đóng sidebar và backdrop
+          function openSidebar() {
+            content.classList.add("open");
+            backdrop.style.display = "block"; //mở lớp phủ
+            // ngăn scroll trang chính
+            document.body.style.overflow = "hidden";
+          }
+          function closeSidebar() {
+            content.classList.remove("open");
+            backdrop.style.display = "none";
+            document.body.style.overflow = "";
+          }
+
+          close.addEventListener("click", closeSidebar);
+          // click nút => toggle
+          button_sidebar.addEventListener("click", function (e) {
+            e.preventDefault();
+            openSidebar();
+          });
+
+          // click vào backdrop => đóng sidebar
+          backdrop.addEventListener("click", function () {
+            closeSidebar();
+          });
+        });
+    </script>
+  </body>
+</html>
