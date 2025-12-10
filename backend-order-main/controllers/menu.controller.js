@@ -1,7 +1,19 @@
 const db = require("../config/database");
 
-// Lấy menu
-exports.getMenu = (req, res) => {
+// Lấy menu(web khách)
+exports.getClientMenu = (req, res) => {
+  const sql = "SELECT * FROM menu WHERE status != 'hidden' ORDER BY id DESC";
+
+  db.query(sql, (err, results) => {
+    if (err)
+      return res.status(500).json({ message: "Lỗi lấy menu", error: err });
+
+    res.json({ status: "success", data: results });
+  });
+};
+
+//Lấy menu(web quản lý)
+exports.getAdminMenu = (req, res) => {
   const sql = "SELECT * FROM menu ORDER BY id DESC";
 
   db.query(sql, (err, results) => {
