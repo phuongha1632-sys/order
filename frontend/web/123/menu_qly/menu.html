@@ -66,6 +66,7 @@
       .table-content td {
         border: 2px solid black;
         padding: 12px 4px;
+        width: auto;
       }
 
       .table-content tbody {
@@ -313,7 +314,7 @@
           const mainTableBody1 = document.getElementById("main_table_body");
 
           // gửi request lấy menu về backend
-          fetch("http://localhost:3000/api/menu")
+          fetch("http://localhost:3000/api/menu/admin")
             .then((response) => response.json()) // chuyển response về JS object để frontend đọc
             .then((result) => {
               // Xóa bảng cũ
