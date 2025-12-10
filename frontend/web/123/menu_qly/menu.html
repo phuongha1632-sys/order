@@ -327,13 +327,14 @@
                 row.dataset.name = item.name;
                 row.dataset.price = item.price;
                 row.dataset.status = item.status;
-                row.dataset.image = item.image;
+                const encodedImage = encodeURIComponent(item.image);
+                row.dataset.image = encodedImage; // Gán giá trị đã mã hóa
 
                 row.innerHTML = `<td>${index + 1}</td> 
                 <td>${item.name}</td>
                 <td>${item.price}</td>
                 <td>${item.status}</td>
-                <td>${item.image}</td>
+                <td>${decodeURIComponent(encodedImage)}</td>
                 <td><button class="edit">Sửa</button>
                 <button class="del">Xóa</button></td>`;
 
@@ -354,8 +355,10 @@
             giaid,
             hinhid,
             tinhtrangid,
-            modalTitle;
+            modalTitle,
+            oldHinhId;
           let pageElements = []; // Tải HTML của file(trừ modal)
+          let currentFoodId = null;
 
           fetch(sourcefile_modal)
             .then((res) => res.text())
@@ -375,6 +378,7 @@
               hinhid = modalElement.querySelector("#hinh_input");
               tinhtrangid = modalElement.querySelector("#tinhtrang_input"); // Lấy đúng ID mới
               modalTitle = modalElement.querySelector("h1");
+              oldHinhId = modalElement.querySelector("#old_hinh_input"); // <<< LẤY THAM CHIẾU
 
               // Tham chiếu các phần tử trên trang chính cần disable/enable
               pageElements = Array.from(document.body.children).filter(
@@ -401,48 +405,84 @@
                 giaid.value = "";
                 hinhid.value = "";
                 tinhtrangid.value = "";
-
-                // Rất quan trọng: Xóa sự kiện cũ trước khi gán sự kiện mới // ngăn chặn việc nút OK gọi cả Thêm và Sửa cùng lúc (lỗi "listener chồng chéo")
-                okButton.replaceWith(okButton.cloneNode(true));
-                okButton = modalElement.querySelector("#confirm"); // Gán lại tham chiếu sau khi clone // Gán lại sự kiện đóng modal cho nút mới
               }
 
               // Gán sự kiện đóng modal
               closeButton.addEventListener("click", hideModal);
+              // File: index.html (Dán ngay dưới dòng // Gán sự kiện đóng modal)
 
-              // SCRIPT 4: XỬ LÝ THÊM MÓN (ADD) // ---------------------------------------------------- // ----------------------------------------------------
-              createButton.addEventListener("click", function (e) {
+              // DÒNG NÀY THAY THẾ CHO TẤT CẢ LOGIC GÁN SỰ KIỆN TRƯỚC ĐÓ
+              okButton.addEventListener("click", function (e) {
                 e.preventDefault();
-                // Thiết lập Modal cho chế độ Thêm
-                modalTitle.textContent = "Thêm Món Mới";
-                okButton.textContent = "Thêm Món";
-                openModal();
 
-                // GÁN LOGIC SUBMIT CHỈ CHO CHẾ ĐỘ THÊM
-                okButton.addEventListener("click", function (e) {
-                  e.preventDefault();
-                  const ten = tenid.value.trim(); //tenid là ô nhập tt ở bảng modal(tenid=modalElement.getIdElement(ten_input))
-                  const gia = giaid.value.trim();
-                  const tinhtrang = tinhtrangid.value;
-                  const hinh = hinhid.value.trim();
-                  if (ten === "" || gia === "") {
-                    alert("Vui lòng điền đủ Tên và Giá.");
-                    return;
-                  }
+                const ten = tenid.value.trim();
+                const gia = giaid.value.trim();
+                const tinhtrang = tinhtrangid.value;
+                const hinh = hinhid.value.trim();
 
-                  // Thực hiện POST API (nếu đã nhập đủ thông tin)
+                if (ten === "" || gia === "") {
+                  alert("Vui lòng điền đủ Tên và Giá.");
+                  return;
+                }
+
+                // ----------------------------------------------------
+                // XÁC ĐỊNH CHẾ ĐỘ (THÊM hay SỬA)
+                // ----------------------------------------------------
+                // Xác định đường dẫn ảnh cuối cùng để gửi lên server
+                let finalImage;
+                if (currentFoodId) {
+                  // CHẾ ĐỘ SỬA
+                  // Nếu hinh_input có giá trị (người dùng chọn file mới) thì dùng file mới,
+                  // nếu không thì dùng giá trị từ trường ẩn (ảnh cũ).
+                  finalImage =
+                    hinhid.value.trim() !== ""
+                      ? hinhid.value.trim()
+                      : oldHinhId.value.trim();
+                } else {
+                  // CHẾ ĐỘ THÊM MỚI
+                  finalImage = hinhid.value.trim();
+                }
+                // Nếu currentFoodId có giá trị (từ nút Sửa)
+                if (currentFoodId) {
+                  // ------------------- LOGIC SỬA MÓN (PUT) -------------------
+                  fetch(`http://localhost:3000/api/menu/${currentFoodId}`, {
+                    method: "PUT",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                      // Không cần ID trong body nếu ID nằm trong URL
+                      name: ten,
+                      price: gia,
+                      image: finalImage,
+                      status: tinhtrang,
+                    }),
+                  })
+                    .then((res) => res.json())
+                    .then((data) => {
+                      if (data.status == "success") {
+                        alert("Cập nhật món thành công!");
+                        hideModal();
+                        location.reload();
+                      } else {
+                        alert("Lỗi khi cập nhật món.");
+                      }
+                    })
+                    .catch((err) => {
+                      console.error("Lỗi khi gửi dữ liệu:", err);
+                      alert("Lỗi kết nối hoặc xử lý dữ liệu.");
+                    });
+                } else {
+                  // ------------------- LOGIC THÊM MỚI (POST) -------------------
                   fetch("http://localhost:3000/api/menu", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({
                       name: ten,
                       price: gia,
-                      image: hinh,
+                      image: finalImage,
                       status: tinhtrang,
                     }),
                   })
                     .then((res) => res.json())
-
                     .then((data) => {
                       if (data.status == "success") {
                         alert("Thêm món thành công!");
@@ -452,12 +492,22 @@
                         alert("Lỗi khi thêm món.");
                       }
                     })
-
                     .catch((err) => {
                       console.error("Lỗi khi gửi dữ liệu:", err);
                       alert("Lỗi kết nối hoặc xử lý dữ liệu.");
                     });
-                });
+                }
+              });
+
+              // SCRIPT 4: XỬ LÝ THÊM MÓN (ADD) // ---------------------------------------------------- // ----------------------------------------------------
+              createButton.addEventListener("click", function (e) {
+                e.preventDefault();
+                currentFoodId = null;
+
+                // Thiết lập Modal cho chế độ Thêm
+                modalTitle.textContent = "Thêm Món Mới";
+                okButton.textContent = "Thêm Món";
+                openModal();
               });
 
               // SCRIPT 5: XỬ LÝ SỬA MÓN (EDIT) //
@@ -465,11 +515,13 @@
                 if (e.target.classList.contains("edit")) {
                   const row = e.target.closest("tr");
 
-                  const currentFoodId = row.dataset.foodId;
+                  currentFoodId = row.dataset.foodId;
                   const ten = row.dataset.name;
                   const gia = row.dataset.price;
-                  const hinh = row.dataset.image;
                   const tinhtrang = row.dataset.status;
+                  // ĐIỀU CHỈNH: Giải mã đường dẫn ảnh
+                  const encodedImage = row.dataset.image;
+                  const hinh = decodeURIComponent(encodedImage); // Giải mã để lấy đường dẫn gốc
 
                   modalTitle.textContent = "Cập Nhật Món Ăn";
                   okButton.textContent = "Cập Nhật";
@@ -477,62 +529,15 @@
                   //hiển thị tt lại trên bảng input để bt cần sửa gì
                   tenid.value = ten;
                   giaid.value = gia;
-                  hinhid.value = hinh;
+                  //không thể dùng JavaScript để điền sẵn đường dẫn tệp vào một trường input type="file"
+                  hinhid.value = "";
                   tinhtrangid.value = tinhtrang;
+                  // 1. LƯU GIÁ TRỊ ẢNH CŨ VÀO TRƯỜNG ẨN
+                  oldHinhId.value = hinh;
 
+                  // 2. BẮT BUỘC RESET INPUT FILE để tránh InvalidStateError
+                  hinhid.value = "";
                   openModal(); // GÁN LOGIC SUBMIT CHỈ CHO CHẾ ĐỘ SỬA
-
-                  okButton.addEventListener("click", function (e) {
-                    e.preventDefault();
-
-                    const tenUpdate = tenid.value.trim();
-                    const giaUpdate = giaid.value.trim();
-                    const tinhtrangUpdate = tinhtrangid.value;
-                    const hinhupdate = hinhid.value.trim();
-                    if (tenUpdate === "" || giaUpdate === "") {
-                      alert("Vui lòng điền đủ thông tin.");
-                      return;
-                    }
-
-                    if (!currentFoodId) {
-                      alert("Lỗi: Thiếu ID món ăn để cập nhật.");
-                      return;
-                    }
-
-                    // Thực hiện PUT API
-                    fetch(
-                      `http://localhost:3000/api/menu/${currentFoodId}`,
-
-                      {
-                        method: "PUT",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({
-                          id: currentFoodId,
-                          name: tenUpdate,
-                          price: giaUpdate,
-                          image: hinhupdate,
-                          status: tinhtrangUpdate,
-                        }),
-                      }
-                    )
-                      .then((res) => res.json())
-                      .then((data) => {
-                        if (data.status == "success") {
-                          alert("Cập nhật món thành công!");
-
-                          hideModal(); //đã cập nhật lại okbutton ở hàm hideModal
-
-                          location.reload();
-                        } else {
-                          alert("Lỗi khi cập nhật món.");
-                        }
-                      })
-
-                      .catch((err) => {
-                        console.error("Lỗi khi gửi dữ liệu:", err);
-                        alert("Lỗi kết nối hoặc xử lý dữ liệu.");
-                      });
-                  });
                 }
               });
 
