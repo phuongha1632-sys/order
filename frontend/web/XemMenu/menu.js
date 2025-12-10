@@ -27,7 +27,7 @@ document.addEventListener("DOMContentLoaded", () => {
     div.className = "card";
     div.dataset.id = item.id;
     div.innerHTML = `
-      <img src="${item.img}" class="card-img-top" alt="${item.name}">
+      <img src="${item.image}" class="card-img-top" alt="${item.name}">
       <div class="card-body">
         <h5 class="card-title">${item.name}</h5>
         <p class="card-text">${item.status}</p>
@@ -52,7 +52,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   async function loadItems() {
-    const res = await fetch(`${BASE_URL}/api/menu`);
+    const res = await fetch(`${BASE_URL}/api/menu/client`);
     const data = await res.json();
     return data.data;
   }
