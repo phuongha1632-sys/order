@@ -45,10 +45,11 @@ exports.getAdminMenu = (req, res) => {
 };
 
 exports.addMenuItem = (req, res) => {
-    const { name, price, status } = req.body;
-    if (!name || !price) return res.status(400).json({ message: "Thiếu dữ liệu" });
+    const { name, price, status, image } = req.body;
+    if (!name || !price) 
+      return res.status(400).json({ message: "Thiếu dữ liệu" });
 
-    const imageName = req.file ? req.file.filename : null;
+  const imageName = image || null;
 
     const sql = `INSERT INTO menu (name, price, image, status) VALUES (?, ?, ?, ?)`;
 
@@ -61,10 +62,11 @@ exports.addMenuItem = (req, res) => {
 
 exports.updateMenuItem = (req, res) => {
     const { id } = req.params;
-    const { name, price, status } = req.body;
+    const { name, price, status, image } = req.body;
     const newImage = req.file ? req.file.filename : null;
 
-    if (!name || !price) return res.status(400).json({ message: "Thiếu dữ liệu" });
+    if (!name || !price) 
+      return res.status(400).json({ message: "Thiếu dữ liệu" });
 
     const sqlGet = "SELECT image FROM menu WHERE id=?";
     db.query(sqlGet, [id], (err, rows) => {
