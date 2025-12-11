@@ -14,8 +14,7 @@ const upload = multer({ storage });
 
 router.get("/client", menuController.getClientMenu);
 router.get("/admin", menuController.getAdminMenu);
-router.post("/", upload.single("image"), menuController.addMenuItem);
-router.put("/:id", upload.single("image"), menuController.updateMenuItem);
+router.post("/", menuController.addMenuItem);
+router.put("/:id", menuController.updateMenuItem);
 router.delete("/:id", menuController.deleteMenuItem);
-
 module.exports = router;
