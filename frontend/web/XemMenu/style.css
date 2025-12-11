@@ -6,17 +6,24 @@
 
 body {
     font-family: Arial, sans-serif;
-    background-color: #f9f9f9;
+    background-image: url("../123/menu_qly/k.jpg");
 }
 
 .container {
     width: 100%;
     max-width: 1200px;
-    margin: 0 auto;
+    margin: 0;
     padding: 0 15px;
 }
 
-h1 {
+.container h1 {
+  color: white;
+  font-weight: bolder;
+  text-shadow: -1px -1px 0 #000, /* trên trái */ 1px -1px 0 #000,
+    /* trên phải */ -1px 1px 0 #000, /* dưới trái */ 1px 1px 0 #000;
+}
+
+ h1 {
     color: orange;
     text-align: center;
     padding: 20px 0;
@@ -97,44 +104,45 @@ h1 {
 
 .card {
     width: 100%;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-}
+    border: 1px solid white;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  height: 350px; /* cố định chiều cao 400px */
+  display: flex; /* Dùng flex để quản lý nội dung bên trong */
+  flex-direction: column;
 
 .card-img-top {
     width: 100%;
+      height: 200px;
     object-fit: cover;
+      object-position: center;
     border-radius: 8px 8px 0 0;
 }
 
 .card-body {
-    padding: 15px;
+    padding: 8px;
 }
 
 .card-title {
-    font-size: 1.2rem;
-    margin-bottom: 10px;
+    font-size: 1.3rem;
+      text-align: center;
+    margin-bottom: 2px;
 }
 
-.card-text {
-    font-size: 0.95rem;
-    color: #666;
-    margin-bottom: 12px;
-}
 
 .gia {
-    font-size: 1.3rem;
-    color: #e74c3c;
-    font-weight: bold;
-    margin: 12px 0;
-}
+  text-align: center;
+  font-size: 1.2rem;
+  color: #e74c3c;
+  font-weight: bold;
+  margin: 5px 0;
 
 .quantity {
     display: flex;
     align-items: center;
+      justify-content: center;
     gap: 10px;
-    margin: 15px 0;
+    margin: 5px 0;
 }
 
 .qty-btn {
@@ -151,16 +159,17 @@ h1 {
 }
 
 .qty-input {
-    width: 50px;
-    text-align: center;
-    padding: 8px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
+  width: 50px;
+  height: 36px;
+  text-align: center;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 0;
 }
 
 .add {
     width: 100%;
-    padding: 12px;
+    padding: 8px;
     background: #27ae60;
     color: white;
     border: none;
@@ -212,10 +221,6 @@ h1 {
     .food {
         grid-template-columns: repeat(3,1fr);
         gap: 8px;
-    }
-    
-    h1 {
-        font-size: 20px;
     }
 
     .card-body {
