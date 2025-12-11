@@ -73,7 +73,7 @@ exports.updateMenuItem = (req, res) => {
         if (err || rows.length === 0) return res.status(500).json({ message: "Lỗi" });
 
         const oldImage = rows[0].image;
-        const finalImage = newImage || oldImage;
+    const finalImage = image || null;
 
         const sqlUpdate = `
             UPDATE menu 
