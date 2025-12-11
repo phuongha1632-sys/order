@@ -1,0 +1,237 @@
+/* css của table chính */
+html,
+body {
+  height: 100%;
+  margin: 0;
+}
+#s1 {
+  height: 99vh;
+  padding: 3%;
+  background-image: url("nen.jpg");
+}
+
+#header {
+  color: black;
+  text-align: center;
+}
+
+#header h1 {
+  margin: 0;
+  font-size: 3rem;
+}
+
+/* nút thêm món */
+#create_food {
+  width: 15vh;
+  border-radius: 3px;
+  height: 6.5vh;
+  margin-top: 15px;
+  border: 2px solid;
+  display: flex; /* căn giữa */
+  justify-content: center; /* căn ngang */
+  align-items: center;
+}
+
+#create_food a {
+  text-decoration: none;
+  text-align: center;
+  display: block;
+}
+
+#create_food:hover {
+  box-shadow: 3px 5px 12px rgba(0, 0, 0, 0.555);
+  cursor: pointer;
+  background-color: rgb(231, 73, 73);
+}
+
+.table-content th,
+.table-content td {
+  border: 2px solid black;
+  padding: 12px 4px;
+  width: auto;
+}
+
+.table-content tbody {
+  text-align: center;
+}
+.table-content th {
+  font-size: 1rem;
+}
+
+.table-content {
+  border-collapse: collapse;
+  margin: 20px 0px;
+  border-collapse: collapse;
+  width: 100%;
+  background-color: #cb3232;
+  color: black;
+  display: table;
+}
+#main_table_body tr:nth-child(odd) {
+  background-color: white;
+}
+
+#main_table_body tr:nth-child(even) {
+  background-color: rgb(230, 228, 228);
+}
+
+.table-content th:nth-child(2),
+.table-content td:nth-child(2) {
+  width: 250px;
+  max-width: 250px;
+}
+
+.table-content th:nth-child(4),
+.table-content td:nth-child(4) {
+  width: 150px;
+  max-width: 150px;
+}
+
+/* Cột HÌNH ẢNH (5) */
+.table-content th:nth-child(5),
+.table-content td:nth-child(5) {
+  width: 550px; /* Giới hạn chiều rộng */
+  max-width: 550px;
+  word-break: break-all; /* Tự động ngắt link dài */
+  white-space: normal; /*ko chỉ link mà áp dụng tất cả text*/
+}
+/* Cột HÀNH ĐỘNG (6) */
+.table-content th:nth-child(6),
+.table-content td:nth-child(6) {
+  width: 180px;
+  max-width: 180px;
+}
+
+.edit {
+  margin-right: 5px;
+}
+.close_button i {
+  color: #747373;
+  float: right;
+  font-size: 1.5rem;
+  text-decoration: none;
+}
+.close_button i:hover {
+  color: black;
+}
+
+/* ----------------------CSS CỦA MODAL------------------------      */
+#modal.overlay {
+  position: fixed;
+  inset: 0;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.6); /* Làm tối nền hơn một chút */
+  z-index: 9999;
+}
+
+#modal.overlay.open {
+  display: flex;
+}
+
+.page-disabled {
+  pointer-events: none;
+  user-select: none;
+}
+
+#modal_content {
+  background: white;
+  padding: 30px;
+  width: 90%;
+  max-width: 450px; /* Thu hẹp lại để form dọc trông cân đối hơn */
+  border-radius: 12px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+  height: auto;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+/* Tiêu đề Modal */
+#modal_content h1 {
+  border-bottom: 2px solid #cb3232;
+  margin: 0 0 20px 0;
+  padding-bottom: 10px;
+  font-size: 1.5rem;
+  color: #333;
+  text-align: center;
+}
+
+/* BỐ CỤC FORM DỌC */
+#table_add {
+  /* Giữ nguyên ID này để không hỏng JS của bạn */
+  display: flex;
+  flex-direction: column;
+  gap: 15px; /* Khoảng cách giữa các ô nhập */
+  text-align: left;
+}
+
+/* Từng nhóm Label + Input */
+#content_add {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+/* Trình bày Label */
+#content_add label {
+  display: block;
+  font-weight: bold;
+  margin-bottom: 5px;
+  font-size: 0.85rem;
+  color: #555;
+  text-transform: uppercase;
+}
+
+/* Định dạng chung cho Input và Select */
+#ten_input,
+#gia_input,
+#tinhtrang_input,
+#hinh_input {
+  width: 100% !important; /* Ép full chiều ngang */
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 1rem;
+  box-sizing: border-box; /* Quan trọng nhất để không bị tràn khung */
+  transition: border-color 0.3s;
+}
+
+#ten_input:focus,
+#gia_input:focus {
+  border-color: #cb3232;
+  outline: none;
+}
+
+/* NÚT XÁC NHẬN */
+#confirm {
+  background-color: rgb(203, 50, 50);
+  width: 100%;
+  padding: 15px;
+  border: none;
+  border-radius: 6px;
+  font-weight: bold;
+  color: white;
+  font-size: 1rem;
+  cursor: pointer;
+  margin-top: 10px;
+  transition: background 0.3s;
+}
+
+#confirm:hover {
+  background-color: rgb(170, 40, 40);
+}
+
+#confirm:hover {
+  background-color: rgb(228, 48, 48);
+}
+
+/* Gán màu chữ trắng và nền đỏ cho hàng tiêu đề */
+#table_add thead tr {
+  background-color: rgb(203, 50, 50); /* Màu đỏ bạn đã chọn */
+  color: white; /* Màu chữ trắng để nổi bật trên nền đỏ */
+  font-weight: bold;
+}
+select:hover {
+  cursor: pointer;
+}
