@@ -30,7 +30,6 @@ document.addEventListener("DOMContentLoaded", () => {
       <img src="${item.image}" class="card-img-top" alt="${item.name}">
       <div class="card-body">
         <h5 class="card-title">${item.name}</h5>
-        <p class="card-text">${item.status}</p>
         <div class="gia">${formatVND(item.price)}</div>
         <div class="quantity">
           <button class="qty-btn minus-btn" data-action="minus">-</button>
