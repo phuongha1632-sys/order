@@ -7,231 +7,9 @@
       href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css"
       rel="stylesheet"
     />
+    <link rel="stylesheet" href="style.css" />
+
     <title>Menu</title>
-
-    <style>
-      /* css của table chính */
-      html,
-      body {
-        height: 100%;
-        margin: 0;
-      }
-      #s1 {
-        height: 99vh;
-        padding: 3%;
-        background-image: url("k.jpg");
-      }
-      #s2 {
-        height: auto;
-        background-color: white;
-        margin: 3%;
-        padding: 25px;
-        border-radius: 8px;
-        min-height: 200px;
-      }
-
-      #header {
-        color: white;
-        text-align: center;
-      }
-
-      #header h1 {
-        margin: 0;
-      }
-
-      /* nút thêm món */
-      #create_food {
-        width: 15vh;
-        border-radius: 3px;
-        height: 5vh;
-        border: 2px solid;
-        display: flex; /* căn giữa */
-        justify-content: center; /* căn ngang */
-        align-items: center;
-      }
-
-      #create_food a {
-        text-decoration: none;
-        text-align: center;
-        display: block;
-      }
-
-      #create_food:hover {
-        box-shadow: 3px 5px 12px rgba(0, 0, 0, 0.555);
-        cursor: pointer;
-        background-color: rgb(231, 73, 73);
-      }
-
-      .table-content th,
-      .table-content td {
-        border: 2px solid black;
-        padding: 12px 4px;
-        width: auto;
-      }
-
-      .table-content tbody {
-        text-align: center;
-      }
-      .table-content th {
-        font-size: 1rem;
-      }
-
-      .table-content {
-        border-collapse: collapse;
-        margin: 6% 0px;
-        border-collapse: collapse;
-        width: 100%;
-        background-color: #cb3232;
-        color: black;
-        display: table;
-      }
-      #main_table_body tr:nth-child(odd) {
-        background-color: white;
-      }
-
-      #main_table_body tr:nth-child(even) {
-        background-color: rgb(230, 228, 228);
-      }
-      .close_button i {
-        color: #747373;
-        float: right;
-        font-size: 1.5rem;
-        text-decoration: none;
-      }
-      .close_button i:hover {
-        color: black;
-      }
-
-      /* ----------------------CSS CỦA MODAL------------------------      */
-      #modal.overlay {
-        position: fixed;
-        inset: 0;
-        display: none;
-        align-items: center;
-        justify-content: center;
-        background: rgba(0, 0, 0, 0.6); /* Làm tối nền hơn một chút */
-        z-index: 9999;
-      }
-
-      #modal.overlay.open {
-        display: flex;
-      }
-
-      .page-disabled {
-        pointer-events: none;
-        user-select: none;
-      }
-
-      #modal_content {
-        background: white;
-        padding: 30px;
-        width: 90%;
-        max-width: 450px; /* Thu hẹp lại để form dọc trông cân đối hơn */
-        margin: auto;
-        border-radius: 12px;
-        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
-        height: auto;
-        max-height: 90vh;
-        overflow-y: auto;
-      }
-
-      /* Tiêu đề Modal */
-      #modal_content h1 {
-        border-bottom: 2px solid #cb3232;
-        margin: 0 0 20px 0;
-        padding-bottom: 10px;
-        font-size: 1.5rem;
-        color: #333;
-        text-align: center;
-      }
-
-      /* BỐ CỤC FORM DỌC */
-      #table_add {
-        /* Giữ nguyên ID này để không hỏng JS của bạn */
-        display: flex;
-        flex-direction: column;
-        gap: 15px; /* Khoảng cách giữa các ô nhập */
-        text-align: left;
-      }
-
-      /* Từng nhóm Label + Input */
-      #content_add {
-        display: flex;
-        flex-direction: column;
-        gap: 15px;
-      }
-
-      /* Trình bày Label */
-      #content_add label {
-        display: block;
-        font-weight: bold;
-        margin-bottom: 5px;
-        font-size: 0.85rem;
-        color: #555;
-        text-transform: uppercase;
-      }
-
-      /* Định dạng chung cho Input và Select */
-      #ten_input,
-      #gia_input,
-      #tinhtrang_input,
-      #hinh_input {
-        width: 100% !important; /* Ép full chiều ngang */
-        padding: 12px;
-        border: 1px solid #ddd;
-        border-radius: 6px;
-        font-size: 1rem;
-        box-sizing: border-box; /* Quan trọng nhất để không bị tràn khung */
-        transition: border-color 0.3s;
-      }
-
-      #ten_input:focus,
-      #gia_input:focus {
-        border-color: #cb3232;
-        outline: none;
-      }
-
-      /* NÚT XÁC NHẬN */
-      #confirm {
-        background-color: rgb(203, 50, 50);
-        width: 100%;
-        padding: 15px;
-        border: none;
-        border-radius: 6px;
-        font-weight: bold;
-        color: white;
-        font-size: 1rem;
-        cursor: pointer;
-        margin-top: 10px;
-        transition: background 0.3s;
-      }
-
-      #confirm:hover {
-        background-color: rgb(170, 40, 40);
-      }
-
-      /* Responsive cho Mobile */
-      @media screen and (max-width: 480px) {
-        #modal_content {
-          width: 95%;
-          padding: 20px;
-        }
-      }
-
-      #confirm:hover {
-        background-color: rgb(228, 48, 48);
-      }
-
-      /* Gán màu chữ trắng và nền đỏ cho hàng tiêu đề */
-      #table_add thead tr {
-        background-color: rgb(203, 50, 50); /* Màu đỏ bạn đã chọn */
-        color: white; /* Màu chữ trắng để nổi bật trên nền đỏ */
-        font-weight: bold;
-      }
-      select:hover {
-        cursor: pointer;
-      }
-    </style>
   </head>
 
   <body>
@@ -240,7 +18,7 @@
       <div id="place-sidebar"></div>
 
       <div id="header">
-        <h1>Update Menu</h1>
+        <h1>UPDATE MENU</h1>
       </div>
 
       <!-- chèn sidebar -->
@@ -285,52 +63,51 @@
           });
       </script>
       <!-- phần nội dung bảng chính hiển thị menu -->
-      <div id="s2">
-        <!-- nút thêm món -->
-        <div id="create_food" style="background-color: rgb(9, 180, 9)">
-          <a href="#" style="color: white">Thêm món</a>
-        </div>
+      <!-- nút thêm món -->
+      <div id="create_food" style="background-color: rgb(9, 180, 9)">
+        <a href="#" style="color: white">Thêm món</a>
+      </div>
 
-        <!-- bảng chính -->
-        <div class="table-container">
-          <table class="table-content">
-            <thead>
-              <tr>
-                <th>ID</th>
-                <th>TÊN MÓN</th>
-                <th>GIÁ</th>
-                <th>TÌNH TRẠNG</th>
-                <th>HÌNH ẢNH</th>
-                <th>HÀNH ĐỘNG</th>
-              </tr>
-            </thead>
+      <!-- bảng chính -->
+      <div class="table-container">
+        <table class="table-content">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>TÊN MÓN</th>
+              <th>GIÁ</th>
+              <th>TÌNH TRẠNG</th>
+              <th>HÌNH ẢNH</th>
+              <th>HÀNH ĐỘNG</th>
+            </tr>
+          </thead>
 
-            <tbody id="main_table_body"></tbody>
-          </table>
-        </div>
+          <tbody id="main_table_body"></tbody>
+        </table>
+      </div>
 
-        <!-- hiển thị menu -->
-        <script>
-          const mainTableBody1 = document.getElementById("main_table_body");
+      <!-- hiển thị menu -->
+      <script>
+        const mainTableBody1 = document.getElementById("main_table_body");
 
-          // gửi request lấy menu về backend
-          fetch("http://localhost:3000/api/menu/admin")
-            .then((response) => response.json()) // chuyển response về JS object để frontend đọc
-            .then((result) => {
-              // Xóa bảng cũ
-              mainTableBody1.innerHTML = "";
+        // gửi request lấy menu về backend
+        fetch("http://localhost:3000/api/menu/admin")
+          .then((response) => response.json()) // chuyển response về JS object để frontend đọc
+          .then((result) => {
+            // Xóa bảng cũ
+            mainTableBody1.innerHTML = "";
 
-              // Duyệt từng món ăn
-              result.data.forEach((item, index) => {
-                const row = document.createElement("tr"); // GÁN DATA ATTRIBUTES (Quan trọng cho chức năng Sửa/Xóa)
-                row.dataset.foodId = item.id;
-                row.dataset.name = item.name;
-                row.dataset.price = item.price;
-                row.dataset.status = item.status;
-                const encodedImage = encodeURIComponent(item.image);
-                row.dataset.image = encodedImage; // Gán giá trị đã mã hóa
+            // Duyệt từng món ăn
+            result.data.forEach((item, index) => {
+              const row = document.createElement("tr"); // GÁN DATA ATTRIBUTES (Quan trọng cho chức năng Sửa/Xóa)
+              row.dataset.foodId = item.id;
+              row.dataset.name = item.name;
+              row.dataset.price = item.price;
+              row.dataset.status = item.status;
+              const encodedImage = encodeURIComponent(item.image);
+              row.dataset.image = encodedImage; // Gán giá trị đã mã hóa
 
-                row.innerHTML = `<td>${index + 1}</td> 
+              row.innerHTML = `<td>${index + 1}</td> 
                 <td>${item.name}</td>
                 <td>${item.price}</td>
                 <td>${item.status}</td>
@@ -338,252 +115,251 @@
                 <td><button class="edit">Sửa</button>
                 <button class="del">Xóa</button></td>`;
 
-                mainTableBody1.appendChild(row);
-              });
+              mainTableBody1.appendChild(row);
             });
-        </script>
+          });
+      </script>
 
-        <!-- chèn modal -->
-        <script>
-          const sourcefile_modal = "modal.html";
-          const createButton = document.getElementById("create_food");
-          const mainTableBody = document.getElementById("main_table_body");
-          let modalElement,
-            okButton,
-            closeButton,
-            tenid,
-            giaid,
-            hinhid,
-            tinhtrangid,
-            modalTitle,
-            oldHinhId;
-          let pageElements = []; // Tải HTML của file(trừ modal)
-          let currentFoodId = null;
+      <!-- chèn modal -->
+      <script>
+        const sourcefile_modal = "modal.html";
+        const createButton = document.getElementById("create_food");
+        const mainTableBody = document.getElementById("main_table_body");
+        let modalElement,
+          okButton,
+          closeButton,
+          tenid,
+          giaid,
+          hinhid,
+          tinhtrangid,
+          modalTitle,
+          oldHinhId;
+        let pageElements = []; // Tải HTML của file(trừ modal)
+        let currentFoodId = null;
 
-          fetch(sourcefile_modal)
-            .then((res) => res.text())
-            .then((html) => {
-              // 1. CHÈN MODAL VÀO DOM
-              const tmp = document.createElement("div");
-              tmp.innerHTML = html;
-              modalElement = tmp.querySelector("#modal");
-              modalElement.classList.add("overlay");
-              document.body.appendChild(modalElement);
+        fetch(sourcefile_modal)
+          .then((res) => res.text())
+          .then((html) => {
+            // 1. CHÈN MODAL VÀO DOM
+            const tmp = document.createElement("div");
+            tmp.innerHTML = html;
+            modalElement = tmp.querySelector("#modal");
+            modalElement.classList.add("overlay");
+            document.body.appendChild(modalElement);
 
-              // 2. LẤY THAM CHIẾU
-              okButton = modalElement.querySelector("#confirm");
-              closeButton = modalElement.querySelector(".close_button");
-              tenid = modalElement.querySelector("#ten_input");
-              giaid = modalElement.querySelector("#gia_input");
-              hinhid = modalElement.querySelector("#hinh_input");
-              tinhtrangid = modalElement.querySelector("#tinhtrang_input"); // Lấy đúng ID mới
-              modalTitle = modalElement.querySelector("h1");
-              oldHinhId = modalElement.querySelector("#old_hinh_input"); // <<< LẤY THAM CHIẾU
+            // 2. LẤY THAM CHIẾU
+            okButton = modalElement.querySelector("#confirm");
+            closeButton = modalElement.querySelector(".close_button");
+            tenid = modalElement.querySelector("#ten_input");
+            giaid = modalElement.querySelector("#gia_input");
+            hinhid = modalElement.querySelector("#hinh_input");
+            tinhtrangid = modalElement.querySelector("#tinhtrang_input"); // Lấy đúng ID mới
+            modalTitle = modalElement.querySelector("h1");
+            oldHinhId = modalElement.querySelector("#old_hinh_input"); // <<< LẤY THAM CHIẾU
 
-              // Tham chiếu các phần tử trên trang chính cần disable/enable
-              pageElements = Array.from(document.body.children).filter(
-                (child) => child !== modalElement
+            // Tham chiếu các phần tử trên trang chính cần disable/enable
+            pageElements = Array.from(document.body.children).filter(
+              (child) => child !== modalElement
+            );
+
+            // 3. ĐỊNH NGHĨA HÀM DÙNG CHUNG (Open/Close Modal)
+            function openModal() {
+              modalElement.classList.add("open");
+              document.body.style.overflow = "hidden";
+              pageElements.forEach((child) =>
+                child.classList.add("page-disabled")
               );
+            }
 
-              // 3. ĐỊNH NGHĨA HÀM DÙNG CHUNG (Open/Close Modal)
-              function openModal() {
-                modalElement.classList.add("open");
-                document.body.style.overflow = "hidden";
-                pageElements.forEach((child) =>
-                  child.classList.add("page-disabled")
-                );
+            function hideModal() {
+              modalElement.classList.remove("open");
+              document.body.style.overflow = "";
+              pageElements.forEach((child) =>
+                child.classList.remove("page-disabled")
+              ); // Reset input sau khi đóng
+
+              tenid.value = "";
+              giaid.value = "";
+              hinhid.value = "";
+              tinhtrangid.value = "";
+            }
+
+            // Gán sự kiện đóng modal
+            closeButton.addEventListener("click", hideModal);
+            // File: index.html (Dán ngay dưới dòng // Gán sự kiện đóng modal)
+
+            // DÒNG NÀY THAY THẾ CHO TẤT CẢ LOGIC GÁN SỰ KIỆN TRƯỚC ĐÓ
+            okButton.addEventListener("click", function (e) {
+              e.preventDefault();
+
+              const ten = tenid.value.trim();
+              const gia = giaid.value.trim();
+              const tinhtrang = tinhtrangid.value;
+              const hinh = hinhid.value.trim();
+
+              if (ten === "" || gia === "") {
+                alert("Vui lòng điền đủ Tên và Giá.");
+                return;
               }
 
-              function hideModal() {
-                modalElement.classList.remove("open");
-                document.body.style.overflow = "";
-                pageElements.forEach((child) =>
-                  child.classList.remove("page-disabled")
-                ); // Reset input sau khi đóng
+              // ----------------------------------------------------
+              // XÁC ĐỊNH CHẾ ĐỘ (THÊM hay SỬA)
+              // ----------------------------------------------------
+              // Xác định đường dẫn ảnh cuối cùng để gửi lên server
+              let finalImage;
+              if (currentFoodId) {
+                // CHẾ ĐỘ SỬA
+                // Nếu hinh_input có giá trị (người dùng chọn file mới) thì dùng file mới,
+                // nếu không thì dùng giá trị từ trường ẩn (ảnh cũ).
+                finalImage =
+                  hinhid.value.trim() !== ""
+                    ? hinhid.value.trim()
+                    : oldHinhId.value.trim();
+              } else {
+                // CHẾ ĐỘ THÊM MỚI
+                finalImage = hinhid.value.trim();
+              }
+              // Nếu currentFoodId có giá trị (từ nút Sửa)
+              if (currentFoodId) {
+                // ------------------- LOGIC SỬA MÓN (PUT) -------------------
+                fetch(`http://localhost:3000/api/menu/${currentFoodId}`, {
+                  method: "PUT",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({
+                    // Không cần ID trong body nếu ID nằm trong URL
+                    name: ten,
+                    price: gia,
+                    image: finalImage,
+                    status: tinhtrang,
+                  }),
+                })
+                  .then((res) => res.json())
+                  .then((data) => {
+                    if (data.status == "success") {
+                      alert("Cập nhật món thành công!");
+                      hideModal();
+                      location.reload();
+                    } else {
+                      alert("Lỗi khi cập nhật món.");
+                    }
+                  })
+                  .catch((err) => {
+                    console.error("Lỗi khi gửi dữ liệu:", err);
+                    alert("Lỗi kết nối hoặc xử lý dữ liệu.");
+                  });
+              } else {
+                // ------------------- LOGIC THÊM MỚI (POST) -------------------
+                fetch("http://localhost:3000/api/menu", {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({
+                    name: ten,
+                    price: gia,
+                    image: finalImage,
+                    status: tinhtrang,
+                  }),
+                })
+                  .then((res) => res.json())
+                  .then((data) => {
+                    if (data.status == "success") {
+                      alert("Thêm món thành công!");
+                      hideModal();
+                      location.reload();
+                    } else {
+                      alert("Lỗi khi thêm món.");
+                    }
+                  })
+                  .catch((err) => {
+                    console.error("Lỗi khi gửi dữ liệu:", err);
+                    alert("Lỗi kết nối hoặc xử lý dữ liệu.");
+                  });
+              }
+            });
 
-                tenid.value = "";
-                giaid.value = "";
+            // SCRIPT 4: XỬ LÝ THÊM MÓN (ADD) // ---------------------------------------------------- // ----------------------------------------------------
+            createButton.addEventListener("click", function (e) {
+              e.preventDefault();
+              currentFoodId = null;
+
+              // Thiết lập Modal cho chế độ Thêm
+              modalTitle.textContent = "Thêm Món Mới";
+              okButton.textContent = "Thêm Món";
+              openModal();
+            });
+
+            // SCRIPT 5: XỬ LÝ SỬA MÓN (EDIT) //
+            mainTableBody.addEventListener("click", function (e) {
+              if (e.target.classList.contains("edit")) {
+                const row = e.target.closest("tr");
+
+                currentFoodId = row.dataset.foodId;
+                const ten = row.dataset.name;
+                const gia = row.dataset.price;
+                const tinhtrang = row.dataset.status;
+                // ĐIỀU CHỈNH: Giải mã đường dẫn ảnh
+                const encodedImage = row.dataset.image;
+                const hinh = decodeURIComponent(encodedImage); // Giải mã để lấy đường dẫn gốc
+
+                modalTitle.textContent = "Cập Nhật Món Ăn";
+                okButton.textContent = "Cập Nhật";
+
+                //hiển thị tt lại trên bảng input để bt cần sửa gì
+                tenid.value = ten;
+                giaid.value = gia;
+                //không thể dùng JavaScript để điền sẵn đường dẫn tệp vào một trường input type="file"
                 hinhid.value = "";
-                tinhtrangid.value = "";
+                tinhtrangid.value = tinhtrang;
+                // 1. LƯU GIÁ TRỊ ẢNH CŨ VÀO TRƯỜNG ẨN
+                oldHinhId.value = hinh;
+
+                // 2. BẮT BUỘC RESET INPUT FILE để tránh InvalidStateError
+                hinhid.value = "";
+                openModal(); // GÁN LOGIC SUBMIT CHỈ CHO CHẾ ĐỘ SỬA
               }
+            });
 
-              // Gán sự kiện đóng modal
-              closeButton.addEventListener("click", hideModal);
-              // File: index.html (Dán ngay dưới dòng // Gán sự kiện đóng modal)
+            // SCRIPT 6: XỬ LÝ XÓA MÓN (DELETE) //
+            mainTableBody.addEventListener("click", function (e) {
+              if (e.target.classList.contains("del")) {
+                const row = e.target.closest("tr");
 
-              // DÒNG NÀY THAY THẾ CHO TẤT CẢ LOGIC GÁN SỰ KIỆN TRƯỚC ĐÓ
-              okButton.addEventListener("click", function (e) {
-                e.preventDefault();
+                const foodIdToDelete = row.dataset.foodId;
+                const foodName = row.dataset.name;
 
-                const ten = tenid.value.trim();
-                const gia = giaid.value.trim();
-                const tinhtrang = tinhtrangid.value;
-                const hinh = hinhid.value.trim();
-
-                if (ten === "" || gia === "") {
-                  alert("Vui lòng điền đủ Tên và Giá.");
+                if (!foodIdToDelete) {
+                  alert("Không tìm thấy ID món ăn để xóa.");
                   return;
                 }
 
-                // ----------------------------------------------------
-                // XÁC ĐỊNH CHẾ ĐỘ (THÊM hay SỬA)
-                // ----------------------------------------------------
-                // Xác định đường dẫn ảnh cuối cùng để gửi lên server
-                let finalImage;
-                if (currentFoodId) {
-                  // CHẾ ĐỘ SỬA
-                  // Nếu hinh_input có giá trị (người dùng chọn file mới) thì dùng file mới,
-                  // nếu không thì dùng giá trị từ trường ẩn (ảnh cũ).
-                  finalImage =
-                    hinhid.value.trim() !== ""
-                      ? hinhid.value.trim()
-                      : oldHinhId.value.trim();
-                } else {
-                  // CHẾ ĐỘ THÊM MỚI
-                  finalImage = hinhid.value.trim();
-                }
-                // Nếu currentFoodId có giá trị (từ nút Sửa)
-                if (currentFoodId) {
-                  // ------------------- LOGIC SỬA MÓN (PUT) -------------------
-                  fetch(`http://localhost:3000/api/menu/${currentFoodId}`, {
-                    method: "PUT",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({
-                      // Không cần ID trong body nếu ID nằm trong URL
-                      name: ten,
-                      price: gia,
-                      image: finalImage,
-                      status: tinhtrang,
-                    }),
+                // Hỏi xác nhận trước khi xóa
+                if (confirm(`Bạn có chắc chắn muốn xóa món: ${foodName}?`)) {
+                  const apiUrl = `http://localhost:3000/api/menu/${foodIdToDelete}`; // Thay bằng API xóa thực tế
+
+                  fetch(apiUrl, {
+                    method: "DELETE",
                   })
                     .then((res) => res.json())
+
                     .then((data) => {
                       if (data.status == "success") {
-                        alert("Cập nhật món thành công!");
-                        hideModal();
+                        alert(`Đã xóa món ${foodName} thành công.`); // Tải lại trang để cập nhật bảng
+
                         location.reload();
                       } else {
-                        alert("Lỗi khi cập nhật món.");
+                        alert(`Lỗi khi xóa món ${foodName}.`);
                       }
                     })
+
                     .catch((err) => {
-                      console.error("Lỗi khi gửi dữ liệu:", err);
-                      alert("Lỗi kết nối hoặc xử lý dữ liệu.");
-                    });
-                } else {
-                  // ------------------- LOGIC THÊM MỚI (POST) -------------------
-                  fetch("http://localhost:3000/api/menu", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({
-                      name: ten,
-                      price: gia,
-                      image: finalImage,
-                      status: tinhtrang,
-                    }),
-                  })
-                    .then((res) => res.json())
-                    .then((data) => {
-                      if (data.status == "success") {
-                        alert("Thêm món thành công!");
-                        hideModal();
-                        location.reload();
-                      } else {
-                        alert("Lỗi khi thêm món.");
-                      }
-                    })
-                    .catch((err) => {
-                      console.error("Lỗi khi gửi dữ liệu:", err);
-                      alert("Lỗi kết nối hoặc xử lý dữ liệu.");
+                      console.error("Lỗi khi gửi yêu cầu xóa:", err);
+
+                      alert("Lỗi kết nối hoặc xử lý dữ liệu khi xóa.");
                     });
                 }
-              });
-
-              // SCRIPT 4: XỬ LÝ THÊM MÓN (ADD) // ---------------------------------------------------- // ----------------------------------------------------
-              createButton.addEventListener("click", function (e) {
-                e.preventDefault();
-                currentFoodId = null;
-
-                // Thiết lập Modal cho chế độ Thêm
-                modalTitle.textContent = "Thêm Món Mới";
-                okButton.textContent = "Thêm Món";
-                openModal();
-              });
-
-              // SCRIPT 5: XỬ LÝ SỬA MÓN (EDIT) //
-              mainTableBody.addEventListener("click", function (e) {
-                if (e.target.classList.contains("edit")) {
-                  const row = e.target.closest("tr");
-
-                  currentFoodId = row.dataset.foodId;
-                  const ten = row.dataset.name;
-                  const gia = row.dataset.price;
-                  const tinhtrang = row.dataset.status;
-                  // ĐIỀU CHỈNH: Giải mã đường dẫn ảnh
-                  const encodedImage = row.dataset.image;
-                  const hinh = decodeURIComponent(encodedImage); // Giải mã để lấy đường dẫn gốc
-
-                  modalTitle.textContent = "Cập Nhật Món Ăn";
-                  okButton.textContent = "Cập Nhật";
-
-                  //hiển thị tt lại trên bảng input để bt cần sửa gì
-                  tenid.value = ten;
-                  giaid.value = gia;
-                  //không thể dùng JavaScript để điền sẵn đường dẫn tệp vào một trường input type="file"
-                  hinhid.value = "";
-                  tinhtrangid.value = tinhtrang;
-                  // 1. LƯU GIÁ TRỊ ẢNH CŨ VÀO TRƯỜNG ẨN
-                  oldHinhId.value = hinh;
-
-                  // 2. BẮT BUỘC RESET INPUT FILE để tránh InvalidStateError
-                  hinhid.value = "";
-                  openModal(); // GÁN LOGIC SUBMIT CHỈ CHO CHẾ ĐỘ SỬA
-                }
-              });
-
-              // SCRIPT 6: XỬ LÝ XÓA MÓN (DELETE) //
-              mainTableBody.addEventListener("click", function (e) {
-                if (e.target.classList.contains("del")) {
-                  const row = e.target.closest("tr");
-
-                  const foodIdToDelete = row.dataset.foodId;
-                  const foodName = row.dataset.name;
-
-                  if (!foodIdToDelete) {
-                    alert("Không tìm thấy ID món ăn để xóa.");
-                    return;
-                  }
-
-                  // Hỏi xác nhận trước khi xóa
-                  if (confirm(`Bạn có chắc chắn muốn xóa món: ${foodName}?`)) {
-                    const apiUrl = `http://localhost:3000/api/menu/${foodIdToDelete}`; // Thay bằng API xóa thực tế
-
-                    fetch(apiUrl, {
-                      method: "DELETE",
-                    })
-                      .then((res) => res.json())
-
-                      .then((data) => {
-                        if (data.status == "success") {
-                          alert(`Đã xóa món ${foodName} thành công.`); // Tải lại trang để cập nhật bảng
-
-                          location.reload();
-                        } else {
-                          alert(`Lỗi khi xóa món ${foodName}.`);
-                        }
-                      })
-
-                      .catch((err) => {
-                        console.error("Lỗi khi gửi yêu cầu xóa:", err);
-
-                        alert("Lỗi kết nối hoặc xử lý dữ liệu khi xóa.");
-                      });
-                  }
-                }
-              });
+              }
             });
-        </script>
-      </div>
+          });
+      </script>
     </div>
   </body>
 </html>
