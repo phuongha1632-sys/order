@@ -15,12 +15,6 @@ require("./config/database");
 const menuRoutes = require("./routes/menu.routes");
 app.use("/api/menu", menuRoutes);
 
-// Test route
-app.get("/", (req, res) => {
-    res.send("API is running...");
-});
-
-// Run server
 const PORT = process.env.PORT;
 app.listen(PORT, () => {
     console.log(`Server đang chạy tại http://localhost:${PORT}`);
