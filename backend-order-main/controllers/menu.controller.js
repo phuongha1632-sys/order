@@ -48,7 +48,7 @@ exports.addMenuItem = (req, res) => {
     const { name, price, status, image } = req.body;
     if (!name || !price) 
       return res.status(400).json({ message: "Thiếu dữ liệu" });
-
+    if (price < 0)  return res.status(400).json({ message: "Giá không được âm" });
   const imageName = image || null;
 
     const sql = `INSERT INTO menu (name, price, image, status) VALUES (?, ?, ?, ?)`;
@@ -67,7 +67,7 @@ exports.updateMenuItem = (req, res) => {
 
     if (!name || !price) 
       return res.status(400).json({ message: "Thiếu dữ liệu" });
-
+     if (price < 0)  return res.status(400).json({ message: "Giá không được âm" });
     const sqlGet = "SELECT image FROM menu WHERE id=?";
     db.query(sqlGet, [id], (err, rows) => {
         if (err || rows.length === 0) return res.status(500).json({ message: "Lỗi" });
