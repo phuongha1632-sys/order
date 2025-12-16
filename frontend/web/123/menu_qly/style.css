@@ -122,7 +122,7 @@ body {
   display: none;
   align-items: center;
   justify-content: center;
-  background: rgba(0, 0, 0, 0.6); /* Làm tối nền hơn một chút */
+  background: rgba(0, 0, 0, 0.6); /*phủ nd web sau modal*/
   z-index: 9999;
 }
 
@@ -142,7 +142,6 @@ body {
   max-width: 450px; /* Thu hẹp lại để form dọc trông cân đối hơn */
   border-radius: 12px;
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
-  height: auto;
   max-height: 90vh;
   overflow-y: auto;
 }
@@ -155,15 +154,6 @@ body {
   font-size: 1.5rem;
   color: #333;
   text-align: center;
-}
-
-/* BỐ CỤC FORM DỌC */
-#table_add {
-  /* Giữ nguyên ID này để không hỏng JS của bạn */
-  display: flex;
-  flex-direction: column;
-  gap: 15px; /* Khoảng cách giữa các ô nhập */
-  text-align: left;
 }
 
 /* Từng nhóm Label + Input */
@@ -179,8 +169,7 @@ body {
   font-weight: bold;
   margin-bottom: 5px;
   font-size: 0.85rem;
-  color: #555;
-  text-transform: uppercase;
+  color: #4d4a4a;
 }
 
 /* Định dạng chung cho Input và Select */
@@ -188,17 +177,19 @@ body {
 #gia_input,
 #tinhtrang_input,
 #hinh_input {
-  width: 100% !important; /* Ép full chiều ngang */
+  width: 100%; /* Ép full chiều ngang modal-content*/
   padding: 12px;
   border: 1px solid #ddd;
   border-radius: 6px;
   font-size: 1rem;
-  box-sizing: border-box; /* Quan trọng nhất để không bị tràn khung */
+  box-sizing: border-box; /* Quan trọng nhất để không bị tràn khung (width+padding+border)*/
   transition: border-color 0.3s;
 }
 
 #ten_input:focus,
-#gia_input:focus {
+#gia_input:focus,
+#hinh_input:focus,
+#tinhtrang_input:focus {
   border-color: #cb3232;
   outline: none;
 }
@@ -215,7 +206,6 @@ body {
   font-size: 1rem;
   cursor: pointer;
   margin-top: 10px;
-  transition: background 0.3s;
 }
 
 #confirm:hover {
@@ -226,12 +216,7 @@ body {
   background-color: rgb(228, 48, 48);
 }
 
-/* Gán màu chữ trắng và nền đỏ cho hàng tiêu đề */
-#table_add thead tr {
-  background-color: rgb(203, 50, 50); /* Màu đỏ bạn đã chọn */
-  color: white; /* Màu chữ trắng để nổi bật trên nền đỏ */
-  font-weight: bold;
-}
 select:hover {
   cursor: pointer;
 }
+
