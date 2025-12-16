@@ -15,24 +15,5 @@
       </thead>
       <tbody id="chitiet"></tbody>
     </table>
-    <script>
-      const content_table = document.getElementById("chitiet");
-      fetch("http://api/menu")
-        .then((res) => res.json())
-        .then((data) => {
-          forEach((item, index) => {
-            const row = document.createElement("tr");
-            row.innerHTML = `<td>${index + 1}</td>
-                <td>${item.name}</td>
-                <td>${item.quantity}</td>
-                <td>${item.price}</td>`;
-            content_table.appendChild(row);
-          });
-        })
-        .catch((err) => {
-          console.error("Lỗi khi gửi yêu cầu lấy dữ liệu:", err);
-          alert("Lỗi kết nối hoặc xử lý dữ liệu khi hiển thị.");
-        });
-    </script>
   </div>
 </div>
