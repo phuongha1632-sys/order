@@ -1,0 +1,42 @@
+body,
+html {
+  padding: 0;
+}
+
+#header h1 {
+  text-align: center;
+}
+
+#table {
+  width: 80%;
+  margin: 20px auto; /*căn giữa bảng*/
+  border-collapse: collapse;
+}
+#table thead {
+  background-color: #cb3232;
+}
+#table th,
+td {
+  border: 2px solid black;
+  text-align: center;
+}
+
+/*---CSS CỦA MODAL*/
+#modal thead {
+  background-color: #cb3232;
+  border: 2px solid black;
+}
+
+#modal tbody {
+  border-bottom: 1px solid black;
+  border-top: 1px solid black;
+}
+
+#modal.overlay {
+  display: none;
+}
+
+#modal.overlay.open {
+  display: block;
+  background-color: rgba(0, 0, 0, 0.484);
+}
