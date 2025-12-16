@@ -35,12 +35,6 @@
 
     <!--Các hàm dùng chung-->
     <script>
-      //các biến toàn cục (Global Variables)
-      const mainTableBody = document.getElementById("table_body"); //thân bảng nơi chứa tt tất cả các đơn
-      let modalElement;
-      let closeButton, modalTitle;
-      let pageElements = [];
-
       // Hàm mở/đóng Modal (Dùng chung cho Order Detail)
       function openModal() {
         modalElement.classList.add("open");
@@ -58,7 +52,13 @@
     </script>
 
     <script>
-      // ---------------------- CÁC HÀM XỬ LÝ ĐƠN HÀNG ----------------------
+      // ---------------------- CÁC HÀM XỬ LÝ ĐƠN HÀNG ----------------------//
+
+      //các biến toàn cục
+      const mainTableBody = document.getElementById("table_body"); //thân bảng nơi chứa tt tất cả các đơn
+      let modalElement;
+      let closeButton, modalTitle;
+      let pageElements = [];
 
       // Hàm 1: Tải và Hiển thị TẤT CẢ ĐƠN HÀNG (loadOrders)
       function loadOrders() {
@@ -66,7 +66,10 @@
           .then((res) => res.json())
           .then((data) => {
             mainTableBody.innerHTML = ""; //làm sạch bảng trc khi cập nhật đơn mới
-            if (data.length == 0) return;
+            if (data.length == 0) {
+              alert("Không có đơn hàng nào cần xử lý");
+              return;
+            }
 
             data.forEach((item, index) => {
               const row = document.createElement("tr");
@@ -78,8 +81,12 @@
                 <td><a href="#" class="chitietbutton" data-id="${
                   item.iddon
                 }">chi tiết đơn</a></td>
-                <td><button class="confirm">Xác nhận</button>
-                  <button class="cancel">Hủy đơn</button></td>`;
+                <td><button class="confirm" data-id="${
+                  item.iddon
+                }">Xác nhận</button>
+                  <button class="cancel" data-id="${
+                    item.iddon
+                  }">Hủy đơn</button></td>`;
               mainTableBody.appendChild(row);
             });
           })
@@ -90,12 +97,11 @@
             );
           });
       }
-      loadOrders();
+      loadOrders(); //hiển thị thông tin lên bảng chính
 
       // Hàm 2: Tải và Hiển thị CHI TIẾT ĐƠN HÀNG (loadOrderDetail)
       function loadOrderDetail(orderId) {
-        // Lấy tbody của bảng chi tiết (ID: #chitiet)
-        const modalTableBody = modalElement.querySelector("#chitiet");
+        const modalTableBody = modalElement.querySelector("#chitiet"); // tbody của bảng chi tiết
 
         // Gọi API chi tiết đơn hàng theo orderId
         fetch(`http://api/order_detail/${orderId}`)
@@ -106,7 +112,7 @@
             if (Array.isArray(data) && data.length > 0) {
               data.forEach((item, index) => {
                 const row = document.createElement("tr");
-                // Chèn dữ liệu vào các ô <t> theo cấu trúc bảng chi tiết (STT, Tên món, Số lượng, Giá)
+                //theo cấu trúc bảng chi tiết (STT, Tên món, Số lượng, Giá)
                 row.innerHTML = `
                     <td>${index + 1}</td>
                     <td>${item.name}</td>
@@ -157,10 +163,8 @@
 
       // ---------------------- KHỐI KHỞI TẠO (SETUP) ----------------------
 
-      // Tải và Thiết lập Modal (chứa Order Detail)
-      const sourcefile_modal = "chitietdon.html";
-
-      fetch(sourcefile_modal)
+      //Thiết lập Modal (chứa Order Detail)
+      fetch("chitietdon.html")
         .then((res) => res.text())
         .then((html) => {
           // 1. CHÈN MODAL VÀO DOM
@@ -182,9 +186,9 @@
           // 3. Gán sự kiện click cho bảng
           mainTableBody.addEventListener("click", function (e) {
             const target = e.target;
+
             if (target.classList.contains("chitietbutton")) {
               e.preventDefault();
-              const row = target.closest("tr");
               const orderId = target.dataset.id;
               loadOrderDetail(orderId);
               openModal();
@@ -192,25 +196,23 @@
 
             if (target.classList.contains("confirm")) {
               const row = target.closest("tr");
-              const orderId = row.querySelector(".chitietbutton").dataset.id;
+              const orderId = target.dataset.id;
               updateOrderStatus(row, orderId, "confirm");
             }
 
             if (target.classList.contains("cancel")) {
               const row = target.closest("tr");
-              const orderId = row.querySelector(".chitietbutton").dataset.id;
+              const orderId = target.dataset.id;
               updateOrderStatus(row, orderId, "cancel");
             }
           });
         })
         .catch((err) => console.error("Lỗi khi tải Modal:", err));
-
-      // KÍCH HOẠT: Gọi hàm tải danh sách đơn hàng khi Modal đã được thiết lập
     </script>
 
     <!--chèn sidebar-->
     <script>
-      // Hàm mở/đóng Sidebar (Dùng chung cho Sidebar)
+      // Hàm mở/đóng Sidebar
       function openSidebar() {
         const content = document.getElementById("container");
         const backdrop = document.getElementById("sidebar_backdrop");
@@ -230,12 +232,10 @@
           document.body.style.overflow = "";
         }
       }
-
-      const sourcefile = "../sidebar.html";
-      const placeid = "place-sidebar";
-
-      fetch(sourcefile)
-        .then((response) => response.text())
+      //chèn sidebar
+      const placeid = "place-sidebar"; //vị trí chèn sidebar
+      fetch("../sidebar.html")
+        .then((res) => res.text())
         .then((data) => {
           document.getElementById(placeid).innerHTML = data;
 
