@@ -28,7 +28,7 @@
       <div id="frame2">
         <div id="frame_filter">
           <div class="filter-group">
-            <label>Tháng</label>
+            <label for="month">Tháng</label>
             <select id="month">
               <option value="" disabled selected hidden>
                 -- Chọn tháng --
@@ -48,7 +48,7 @@
             </select>
           </div>
           <div class="filter-group">
-            <label>Năm</label>
+            <label for="year">Năm</label>
             <select id="year">
               <option value="" disabled selected hidden>-- Chọn năm --</option>
               <option value="2023">Năm 2023</option>
@@ -66,8 +66,6 @@
         <table id="table">
           <thead>
             <tr>
-              <th>ID ĐƠN HÀNG</th>
-              <th>ID BÀN</th>
               <th>NGÀY</th>
               <th>TỔNG TIỀN</th>
             </tr>
@@ -91,8 +89,6 @@
                   const row = document.createElement("tr");
 
                   row.innerHTML = `
-                  <td data-id="${item.iddon}">${item.iddon}</td>
-                  <td>${item.idban}</td>
                   <td>${item.date}</td>
                   <td data-id="${item.iddon}">${item.total}</td>
                 `;
@@ -167,9 +163,6 @@
             })
             .catch((err) => {
               console.error("Lỗi khi gửi yêu cầu lấy tổng quan:", err);
-              alert(
-                "Lỗi kết nối hoặc xử lý dữ liệu khi hiển thị tổng quan tháng."
-              );
             });
         }
       </script>
@@ -177,17 +170,17 @@
       <script>
         let yearInput, monthInput;
         const confirmbutton = document.getElementById("confirm");
+       
+        confirmbutton.addEventListener("click", function (e) {
+        e.preventDefault();
         monthInput = document.getElementById("month").value;
         yearInput = document.getElementById("year").value;
-
-        confirmbutton.addEventListener("click", function (e) {
           // 2. Kiểm tra xem người dùng đã chọn chưa
           if (!monthInput || !yearInput) {
             alert("Vui lòng chọn đầy đủ Tháng và Năm!");
             return;
           }
 
-          e.preventDefault();
           mainTableBody.innerHTML = "";
           loaddata(monthInput, yearInput);
           loadsummary(monthInput, yearInput);
