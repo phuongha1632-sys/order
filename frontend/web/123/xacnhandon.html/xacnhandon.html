@@ -11,69 +11,69 @@
     <link rel="stylesheet" href="style.css" />
   </head>
   <body>
-    <div id="header">
-      <h1>XÁC NHẬN ĐƠN</h1>
-    </div>
+    <div id="s1">
+      <div id="header">
+        <div id="place-sidebar"></div>
+        <h1>XÁC NHẬN ĐƠN</h1>
+      </div>
+      <div id="content">
+        <table id="table">
+          <thead>
+            <tr>
+              <th>ID ĐƠN HÀNG</th>
+              <th>SỐ BÀN</th>
+              <th>NGÀY</th>
+              <th>TỔNG TIỀN</th>
+              <th>XEM THÔNG TIN</th>
+              <th>THANH TOÁN</th>
+              <th>XÁC NHẬN</th>
+            </tr>
+          </thead>
+          <tbody id="table_body"></tbody>
+        </table>
+      </div>
 
-    <div id="place-sidebar"></div>
+      <!--Các hàm dùng chung-->
+      <script>
+        // Hàm mở/đóng Modal (Dùng chung cho Order Detail)
+        function openModal() {
+          modalElement.classList.add("open");
+          document.body.style.overflow = "hidden";
+          pageElements.forEach((child) => child.classList.add("page-disabled"));
+        }
 
-    <div id="content">
-      <table id="table">
-        <thead>
-          <tr>
-            <th>ID ĐƠN HÀNG</th>
-            <th>SỐ BÀN</th>
-            <th>NGÀY</th>
-            <th>GIÁ</th>
-            <th>XEM THÔNG TIN</th>
-            <th>HÀNH ĐỘNG</th>
-          </tr>
-        </thead>
-        <tbody id="table_body"></tbody>
-      </table>
-    </div>
+        function hideModal() {
+          modalElement.classList.remove("open");
+          document.body.style.overflow = "";
+          pageElements.forEach((child) =>
+            child.classList.remove("page-disabled")
+          );
+        }
+      </script>
 
-    <!--Các hàm dùng chung-->
-    <script>
-      // Hàm mở/đóng Modal (Dùng chung cho Order Detail)
-      function openModal() {
-        modalElement.classList.add("open");
-        document.body.style.overflow = "hidden";
-        pageElements.forEach((child) => child.classList.add("page-disabled"));
-      }
+      <script>
+        // ---------------------- CÁC HÀM XỬ LÝ ĐƠN HÀNG ----------------------//
 
-      function hideModal() {
-        modalElement.classList.remove("open");
-        document.body.style.overflow = "";
-        pageElements.forEach((child) =>
-          child.classList.remove("page-disabled")
-        );
-      }
-    </script>
+        //các biến toàn cục
+        const mainTableBody = document.getElementById("table_body"); //thân bảng nơi chứa tt tất cả các đơn
+        let modalElement;
+        let closeButton, modalTitle;
+        let pageElements = [];
 
-    <script>
-      // ---------------------- CÁC HÀM XỬ LÝ ĐƠN HÀNG ----------------------//
+        // Hàm 1: Tải và Hiển thị TẤT CẢ ĐƠN HÀNG (loadOrders)
+        function loadOrders() {
+          fetch("http://api/order")
+            .then((res) => res.json())
+            .then((data) => {
+              mainTableBody.innerHTML = ""; //làm sạch bảng trc khi cập nhật đơn mới
+              if (data.length == 0) {
+                alert("Không có đơn hàng nào cần xử lý");
+                return;
+              }
 
-      //các biến toàn cục
-      const mainTableBody = document.getElementById("table_body"); //thân bảng nơi chứa tt tất cả các đơn
-      let modalElement;
-      let closeButton, modalTitle;
-      let pageElements = [];
-
-      // Hàm 1: Tải và Hiển thị TẤT CẢ ĐƠN HÀNG (loadOrders)
-      function loadOrders() {
-        fetch("http://api/order")
-          .then((res) => res.json())
-          .then((data) => {
-            mainTableBody.innerHTML = ""; //làm sạch bảng trc khi cập nhật đơn mới
-            if (data.length == 0) {
-              alert("Không có đơn hàng nào cần xử lý");
-              return;
-            }
-
-            data.forEach((item, index) => {
-              const row = document.createElement("tr");
-              row.innerHTML = `
+              data.forEach((item) => {
+                const row = document.createElement("tr");
+                row.innerHTML = `
                 <td>${item.iddon}</td>
                 <td>${item.idban}</td>
                 <td>${item.date}</td>
@@ -81,180 +81,182 @@
                 <td><a href="#" class="chitietbutton" data-id="${
                   item.iddon
                 }">chi tiết đơn</a></td>
+                <td>${item.pricestatus}</td>
                 <td><button class="confirm" data-id="${
                   item.iddon
                 }">Xác nhận</button>
                   <button class="cancel" data-id="${
                     item.iddon
                   }">Hủy đơn</button></td>`;
-              mainTableBody.appendChild(row);
+                mainTableBody.appendChild(row);
+              });
+            })
+            .catch((err) => {
+              console.error("Lỗi khi gửi yêu cầu lấy dữ liệu đơn hàng:", err);
+              alert(
+                "Lỗi kết nối hoặc xử lý dữ liệu khi hiển thị danh sách đơn hàng."
+              );
             });
-          })
-          .catch((err) => {
-            console.error("Lỗi khi gửi yêu cầu lấy dữ liệu đơn hàng:", err);
-            alert(
-              "Lỗi kết nối hoặc xử lý dữ liệu khi hiển thị danh sách đơn hàng."
-            );
-          });
-      }
-      loadOrders(); //hiển thị thông tin lên bảng chính
+        }
+        loadOrders(); //hiển thị thông tin lên bảng chính
 
-      // Hàm 2: Tải và Hiển thị CHI TIẾT ĐƠN HÀNG (loadOrderDetail)
-      function loadOrderDetail(orderId) {
-        const modalTableBody = modalElement.querySelector("#chitiet"); // tbody của bảng chi tiết
+        // Hàm 2: Tải và Hiển thị CHI TIẾT ĐƠN HÀNG (loadOrderDetail)
+        function loadOrderDetail(orderId) {
+          const modalTableBody = modalElement.querySelector("#chitiet"); // tbody của bảng chi tiết
 
-        // Gọi API chi tiết đơn hàng theo orderId
-        fetch(`http://api/order_detail/${orderId}`)
-          .then((res) => res.json())
-          .then((data) => {
-            modalTableBody.innerHTML = "";
+          // Gọi API chi tiết đơn hàng theo orderId
+          fetch(`http://api/order_detail/${orderId}`)
+            .then((res) => res.json())
+            .then((data) => {
+              modalTableBody.innerHTML = "";
 
-            if (Array.isArray(data) && data.length > 0) {
-              data.forEach((item, index) => {
-                const row = document.createElement("tr");
-                //theo cấu trúc bảng chi tiết (STT, Tên món, Số lượng, Giá)
-                row.innerHTML = `
+              if (Array.isArray(data) && data.length > 0) {
+                data.forEach((item, index) => {
+                  const row = document.createElement("tr");
+                  //theo cấu trúc bảng chi tiết (STT, Tên món, Số lượng, Giá)
+                  row.innerHTML = `
                     <td>${index + 1}</td>
                     <td>${item.name}</td>
                     <td>${item.quantity || 1}</td>
                     <td>${item.price || "0"}</td>
                 `;
-                modalTableBody.appendChild(row);
-              });
-            } else {
-              modalTableBody.innerHTML = `<tr><td colspan="4">Không tìm thấy chi tiết món ăn cho đơn hàng #${orderId}.</td></tr>`;
-            }
-          })
-          .catch((err) => {
-            console.error("Lỗi khi tải chi tiết đơn:", err);
-            alert(`Không thể tải chi tiết món ăn cho đơn hàng #${orderId}.`);
-          });
-      }
-
-      // Hàm 3: Xử lý Xác nhận/Hủy đơn hàng (updateOrderStatus)
-      function updateOrderStatus(row, orderId, status) {
-        const actionName = status === "confirm" ? "XÁC NHẬN" : "HỦY";
-
-        if (
-          !confirm(
-            `Bạn có chắc chắn muốn ${actionName} đơn hàng #${orderId} không?`
-          )
-        ) {
-          return;
-        }
-
-        fetch(`http://api/order/update_status/${orderId}`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ status: status }),
-        })
-          .then((res) => res.json())
-          .then((data) => {
-            alert(`${actionName} đơn hàng #${orderId} thành công!`);
-            row.remove(); // Xóa dòng khỏi UI
-          })
-          .catch((err) => {
-            console.error("Lỗi cập nhật trạng thái:", err);
-            alert(
-              `LỖI: Không thể ${actionName.toLowerCase()} đơn hàng #${orderId}.`
-            );
-          });
-      }
-
-      // ---------------------- KHỐI KHỞI TẠO (SETUP) ----------------------
-
-      //Thiết lập Modal (chứa Order Detail)
-      fetch("chitietdon.html")
-        .then((res) => res.text())
-        .then((html) => {
-          // 1. CHÈN MODAL VÀO DOM
-          const tmp = document.createElement("div");
-          tmp.innerHTML = html;
-          modalElement = tmp.querySelector("#modal");
-          modalElement.classList.add("overlay");
-          document.body.appendChild(modalElement);
-
-          // 2. GÁN SỰ KIỆN VÀ THAM CHIẾU
-          closeButton = modalElement.querySelector(".close_button");
-          // Lấy các phần tử trên trang chính để vô hiệu hóa khi modal mở
-          pageElements = Array.from(document.body.children).filter(
-            (child) => child !== modalElement
-          );
-
-          closeButton.addEventListener("click", hideModal);
-
-          // 3. Gán sự kiện click cho bảng
-          mainTableBody.addEventListener("click", function (e) {
-            const target = e.target;
-
-            if (target.classList.contains("chitietbutton")) {
-              e.preventDefault();
-              const orderId = target.dataset.id;
-              loadOrderDetail(orderId);
-              openModal();
-            }
-
-            if (target.classList.contains("confirm")) {
-              const row = target.closest("tr");
-              const orderId = target.dataset.id;
-              updateOrderStatus(row, orderId, "confirm");
-            }
-
-            if (target.classList.contains("cancel")) {
-              const row = target.closest("tr");
-              const orderId = target.dataset.id;
-              updateOrderStatus(row, orderId, "cancel");
-            }
-          });
-        })
-        .catch((err) => console.error("Lỗi khi tải Modal:", err));
-    </script>
-
-    <!--chèn sidebar-->
-    <script>
-      // Hàm mở/đóng Sidebar
-      function openSidebar() {
-        const content = document.getElementById("container");
-        const backdrop = document.getElementById("sidebar_backdrop");
-        if (content && backdrop) {
-          content.classList.add("open");
-          backdrop.style.display = "block";
-          document.body.style.overflow = "hidden";
-        }
-      }
-
-      function closeSidebar() {
-        const content = document.getElementById("container");
-        const backdrop = document.getElementById("sidebar_backdrop");
-        if (content && backdrop) {
-          content.classList.remove("open");
-          backdrop.style.display = "none";
-          document.body.style.overflow = "";
-        }
-      }
-      //chèn sidebar
-      const placeid = "place-sidebar"; //vị trí chèn sidebar
-      fetch("../sidebar.html")
-        .then((res) => res.text())
-        .then((data) => {
-          document.getElementById(placeid).innerHTML = data;
-
-          const button_sidebar = document.getElementById("menu_button");
-          const backdrop = document.getElementById("sidebar_backdrop");
-          const close = document.querySelector(".sidebar-close");
-
-          if (close) {
-            close.addEventListener("click", closeSidebar);
-          }
-
-          if (button_sidebar) {
-            button_sidebar.addEventListener("click", function (e) {
-              e.preventDefault();
-              openSidebar();
+                  modalTableBody.appendChild(row);
+                });
+              } else {
+                modalTableBody.innerHTML = `<tr><td colspan="4">Không tìm thấy chi tiết món ăn cho đơn hàng #${orderId}.</td></tr>`;
+              }
+            })
+            .catch((err) => {
+              console.error("Lỗi khi tải chi tiết đơn:", err);
+              alert(`Không thể tải chi tiết món ăn cho đơn hàng #${orderId}.`);
             });
+        }
+
+        // Hàm 3: Xử lý Xác nhận/Hủy đơn hàng (updateOrderStatus)
+        function updateOrderStatus(row, orderId, status) {
+          const actionName = status === "confirm" ? "XÁC NHẬN" : "HỦY";
+
+          if (
+            !confirm(
+              `Bạn có chắc chắn muốn ${actionName} đơn hàng #${orderId} không?`
+            )
+          ) {
+            return;
           }
-        })
-        .catch((err) => console.error("Lỗi khi tải Sidebar:", err));
-    </script>
+
+          fetch(`http://api/order/update_status/${orderId}`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ status: status }),
+          })
+            .then((res) => res.json())
+            .then((data) => {
+              alert(`${actionName} đơn hàng #${orderId} thành công!`);
+              row.remove(); // Xóa dòng khỏi UI
+            })
+            .catch((err) => {
+              console.error("Lỗi cập nhật trạng thái:", err);
+              alert(
+                `LỖI: Không thể ${actionName.toLowerCase()} đơn hàng #${orderId}.`
+              );
+            });
+        }
+
+        // ---------------------- KHỐI KHỞI TẠO (SETUP) ----------------------
+
+        //Thiết lập Modal (chứa Order Detail)
+        fetch("chitietdon.html")
+          .then((res) => res.text())
+          .then((html) => {
+            // 1. CHÈN MODAL VÀO DOM
+            const tmp = document.createElement("div");
+            tmp.innerHTML = html;
+            modalElement = tmp.querySelector("#modal");
+            modalElement.classList.add("overlay");
+            document.body.appendChild(modalElement);
+
+            // 2. GÁN SỰ KIỆN VÀ THAM CHIẾU
+            closeButton = modalElement.querySelector(".close_button");
+            // Lấy các phần tử trên trang chính để vô hiệu hóa khi modal mở
+            pageElements = Array.from(document.body.children).filter(
+              (child) => child !== modalElement
+            );
+
+            closeButton.addEventListener("click", hideModal);
+
+            // 3. Gán sự kiện click cho bảng
+            mainTableBody.addEventListener("click", function (e) {
+              const target = e.target;
+
+              if (target.classList.contains("chitietbutton")) {
+                e.preventDefault();
+                const orderId = target.dataset.id;
+                loadOrderDetail(orderId);
+                openModal();
+              }
+
+              if (target.classList.contains("confirm")) {
+                const row = target.closest("tr");
+                const orderId = target.dataset.id;
+                updateOrderStatus(row, orderId, "confirm");
+              }
+
+              if (target.classList.contains("cancel")) {
+                const row = target.closest("tr");
+                const orderId = target.dataset.id;
+                updateOrderStatus(row, orderId, "cancel");
+              }
+            });
+          })
+          .catch((err) => console.error("Lỗi khi tải Modal:", err));
+      </script>
+
+      <!--chèn sidebar-->
+      <script>
+        // Hàm mở/đóng Sidebar
+        function openSidebar() {
+          const content = document.getElementById("container");
+          const backdrop = document.getElementById("sidebar_backdrop");
+          if (content && backdrop) {
+            content.classList.add("open");
+            backdrop.style.display = "block";
+            document.body.style.overflow = "hidden";
+          }
+        }
+
+        function closeSidebar() {
+          const content = document.getElementById("container");
+          const backdrop = document.getElementById("sidebar_backdrop");
+          if (content && backdrop) {
+            content.classList.remove("open");
+            backdrop.style.display = "none";
+            document.body.style.overflow = "";
+          }
+        }
+        //chèn sidebar
+        const placeid = "place-sidebar"; //vị trí chèn sidebar
+        fetch("../sidebar.html")
+          .then((res) => res.text())
+          .then((data) => {
+            document.getElementById(placeid).innerHTML = data;
+
+            const button_sidebar = document.getElementById("menu_button");
+            const backdrop = document.getElementById("sidebar_backdrop");
+            const close = document.querySelector(".sidebar-close");
+
+            if (close) {
+              close.addEventListener("click", closeSidebar);
+            }
+
+            if (button_sidebar) {
+              button_sidebar.addEventListener("click", function (e) {
+                e.preventDefault();
+                openSidebar();
+              });
+            }
+          })
+          .catch((err) => console.error("Lỗi khi tải Sidebar:", err));
+      </script>
+    </div>
   </body>
 </html>
