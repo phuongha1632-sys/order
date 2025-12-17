@@ -5,8 +5,8 @@ html {
 }
 
 #s1 {
-  height: auto;
-  padding: 0px 3%;
+  min-height: 100vh;
+  padding: 3% 3% 12% 3%;
   display: flex;
   gap: 20px;
   flex-direction: column; /* Xếp các phần tử con theo chiều dọc (trên-dưới) */
@@ -18,9 +18,11 @@ h1 {
   overflow-y: auto;
   width: 85%;
   margin: auto;
+  height: auto;
 }
 #frame_filter {
   display: flex;
+  flex-direction: row; /* Đảm bảo tháng và năm nằm ngang hàng */
   gap: 40px;
   font-size: 25px;
   align-items: flex-end;
@@ -45,14 +47,13 @@ select {
   width: 130px;
   cursor: pointer;
   background-color: rgb(45, 144, 244);
-  border: none; /* Bỏ viền mặc định của button cho đẹp */
   border: 2px solid black;
   border-radius: 3px;
   font-weight: bold;
   font-size: 18px;
-  margin-left: 74vh;
+  margin-left: 461%;
 }
-#confirm button:hover {
+#confirm:hover {
   background-color: rgb(72, 164, 255);
   box-shadow: 3px 4px 12px rgba(0, 0, 0, 0.555);
 }
@@ -72,7 +73,7 @@ select {
 }
 
 #table {
-  margin: 15px auto 0 auto;
+  margin: 30px auto 0 auto;
   width: 100%;
   border-collapse: collapse;
 }
