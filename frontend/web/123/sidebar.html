@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css"
+      rel="stylesheet"
+    />
+
+    <title>Document</title>
+    <style>
+      body {
+        font-family: "Times New Roman", Times, serif;
+        font-weight: bold;
+        font-size: 20px;
+        margin: 0;
+      }
+
+      /* nút menu */
+      #menu_button {
+        border-radius: 6px;
+        width: 60px;
+        height: 50px;
+        color: white;
+        background-color: rgb(176, 43, 43);
+      }
+
+      /* lớp phủ */
+      #sidebar_backdrop {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.45);
+        z-index: 900; /* thấp hơn sidebar nhưng cao hơn nội dung chính */
+        display: none;
+      }
+
+      #container {
+        position: fixed;
+        left: 0;
+        top: 0;
+        height: 100vh;
+        width: 30vh;
+        max-width: 320px; /* giới hạn cho desktop */
+        background-color: red;
+        transform: translateX(-110%);
+        transition: transform 300ms ease;
+        z-index: 1000; /* trên backdrop */
+        padding-top: 1rem;
+        border-radius: 0 8px 8px 0;
+        display: none;
+      }
+
+      /* hiện sidebar khi thêm class open */
+      #container.open {
+        transform: translateX(0);
+        display: block;
+      }
+
+      #sidebar-content a {
+        margin: 20px;
+        text-decoration: none;
+        display: block;
+        color: black;
+      }
+
+      #sidebar-content a:hover {
+        background-color: rgb(227, 58, 58);
+      }
+
+      /* hover nút */
+      #menu_button:hover {
+        box-shadow: 3px 5px 12px rgba(0, 0, 0, 0.555);
+        cursor: pointer;
+        background-color: rgb(213, 116, 116);
+      }
+
+      /* CSS mới cho phần Header của Sidebar */
+      #sidebar-header {
+        display: flex;
+        justify-content: space-between; /* Đẩy tiêu đề sang trái, nút x sang phải */
+        align-items: center; /* Căn giữa theo chiều dọc */
+        padding: 0 15px 10px 15px; /* Thêm khoảng cách hai bên cho đẹp */
+        border-bottom: 1px solid rgba(0, 0, 0, 0.1); /* Đường kẻ mờ ngăn cách */
+      }
+
+      #sidebar-header h1 {
+        margin: 0; /* Bỏ margin mặc định */
+        font-size: 2rem; /* Chỉnh cỡ chữ vừa phải */
+      }
+
+      /* Tùy chỉnh icon đóng x */
+      .sidebar-close {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.8rem; /* Tăng kích thước icon x */
+        text-decoration: none;
+        color: rgb(77, 70, 70);
+      }
+
+      .sidebar-close:hover {
+        color: black;
+      }
+    </style>
+  </head>
+  <!--  -->
+  <body>
+    <!-- nut sidebar -->
+    <div>
+      <button id="menu_button">
+        <i class="bx bx-menu" style="font-size: 25px"></i>
+      </button>
+    </div>
+    <div id="sidebar_backdrop" aria-hidden="true"></div>
+
+    <!-- gdien hien len khi bam nut sidebar -->
+    <div id="container">
+      <div id="sidebar-header">
+        <h1>TÙY CHỌN</h1>
+        <a class="sidebar-close"><i class="bx bx-x"></i></a>
+      </div>
+      <div id="sidebar-content">
+        <a href="/trangchu/trangchu.html">Trang chủ</a>
+        <a href="/xacnhandon.html/xacnhandon.html">Xác nhận đơn</a>
+        <a href="/menu_qly/menu.html">Menu</a>
+        <a href="/doanhthu/doanhthu.html">Doanh thu</a>
+      </div>
+    </div>
+  </body>
+</html>

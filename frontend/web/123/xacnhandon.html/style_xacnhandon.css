@@ -1,0 +1,50 @@
+body,
+html {
+  padding: 0;
+}
+#header {
+  display: flex;
+  margin-bottom: 4%;
+}
+#header h1 {
+  flex-grow: 1; /* Để h1 chiếm không gian còn lạigiản nở width theo cha */
+  text-align: center;
+}
+
+#table {
+  flex-grow: 1;
+  width: 80%;
+  margin: 20px auto; /*căn giữa bảng*/
+  border-collapse: collapse;
+}
+#table thead {
+  background-color: #cb3232;
+}
+#table th,
+td {
+  height: 30px;
+  border: 2px solid black;
+  text-align: center;
+}
+#s1 {
+  padding: 2% 3%;
+}
+/*---CSS CỦA MODAL*/
+#modal thead {
+  background-color: #cb3232;
+  border: 2px solid black;
+}
+
+#modal tbody {
+  border-bottom: 1px solid black;
+  border-top: 1px solid black;
+}
+
+#modal.overlay {
+  display: none;
+}
+
+#modal.overlay.open {
+  display: block;
+  background-color: rgba(0, 0, 0, 0.484);
+}
