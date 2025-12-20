@@ -79,19 +79,23 @@
         const mainTableBody = document.getElementById("table_body");
         function loaddata(month, year) {
           fetch(
-            `http://localhost:5000/doanhthuthang?month=${month}&year=${year}`
+            `http://localhost:3000/api/admin/report/revenue?month=${month}&year=${year}`
           )
             .then((res) => res.json())
-            .then((data) => {
+            .then((resData) => {
               mainTableBody.innerHTML = "";
-              if (Array.isArray(data) && data.length > 0) {
+              const data = resData.data;
+              if (data.length > 0) {
                 data.forEach((item) => {
                   const row = document.createElement("tr");
 
                   row.innerHTML = `
-                  <td>${item.date}</td>
-                  <td data-id="${item.iddon}">${item.total}</td>
-                `;
+<td>${String(item.day).padStart(2, "0")}/${String(month).padStart(
+                    2,
+                    "0"
+                  )}/${year}</td>                  <td>${new Intl.NumberFormat(
+                    "vi-VN"
+                  ).format(item.total)} đ</td>                `;
 
                   mainTableBody.appendChild(row);
                 });
@@ -134,14 +138,25 @@
 
         // 2. Hàm fetch dữ liệu từ BE
         function loadChartData(month, year) {
-          fetch(`http://localhost:5000/summary?month=${month}&year=${year}`)
+          fetch(
+            `http://localhost:3000/api/admin/report/revenue?month=${month}&year=${year}`
+          )
             .then((res) => res.json())
-            .then((data) => {
-              const dsachngay = data.map((item) => item.day);
-              const danh_sach_tien = data.map((item) => item.tien);
-              myChart.data.datasets[0].data = danh_sach_tien;
-              myChart.data.datasets[0].label = `Doanh thu tháng ${month} năm ${year}`;
-              myChart.data.labels = dsachngay;
+            .then((resData) => {
+              const data = resData.data; // Lấy mảng từ thuộc tính data
+              const daysInMonth = new Date(year, month, 0).getDate(); // Lấy tổng ngày trong tháng
+
+              const labels = [];
+              const values = [];
+
+              for (let d = 1; d <= daysInMonth; d++) {
+                labels.push(d); // Trục X hiện từ 1 đến 30/31
+                const found = data.find((item) => item.day === d);
+                values.push(found ? found.total : 0); // Ngày nào không bán được thì hiện số 0
+              }
+
+              myChart.data.labels = labels;
+              myChart.data.datasets[0].data = values;
               // Vẽ lại biểu đồ với dữ liệu mới
               myChart.update();
             })
@@ -152,29 +167,51 @@
       <!--Tải tt tổng quát của tháng-->
       <script>
         const right = document.getElementById("summary");
-        function loadsummary(month, year) {
-          right.innerHTML = "";
-          fetch(`http://localhost:5000/summary?month=${month}&year=${year}`)
-            .then((res) => res.json())
-            .then((data) => {
-              right.innerHTML = `
-            <p><i class="bx-bxs-fire"></i>Món bán chạy nhất tháng ${data.bestseller}</p>
-            <p><i class=" bx-bxs-money">Tổng doanh thu ${data.total}</i></p>`;
-            })
-            .catch((err) => {
-              console.error("Lỗi khi gửi yêu cầu lấy tổng quan:", err);
-            });
+        async function loadsummary(month, year) {
+          try {
+            // Gọi cả 2 API cùng lúc
+            const [resBest, resTotal] = await Promise.all([
+              fetch(
+                `http://localhost:3000/api/admin/report/best-seller?month=${month}&year=${year}`
+              ),
+              fetch(
+                `http://localhost:3000/api/admin/report/revenue/month?month=${month}&year=${year}`
+              ),
+            ]);
+
+            const dataBest = await resBest.json();
+            const dataTotal = await resTotal.json();
+
+            // Lấy giá trị an toàn (nếu null thì hiện N/A hoặc 0)
+            const bestSellerName = dataBest.data ? dataBest.data : "Chưa có";
+            const totalMoney = dataTotal.data ? dataTotal.data.monthTotal : 0;
+            const formattedTotal = new Intl.NumberFormat("vi-VN").format(
+              totalMoney
+            );
+            // Ghi vào HTML một lần duy nhất
+            right.innerHTML = `
+<p>
+    <i class='bx bx-happy-heart-eyes' style='color: red;   font-size: 40px;
+'></i> 
+    Món bán chạy nhất: <strong>${bestSellerName}</strong>
+  </p>      <p><i class="bx bx-dollar" style='color: #2ecc71;   font-size: 40px;
+'></i> Tổng doanh thu tháng: <strong>${formattedTotal} đ</strong></p>
+    `;
+          } catch (err) {
+            console.error("Lỗi tải summary:", err);
+            right.innerHTML = "<p>Không thể tải thông tin tổng quan.</p>";
+          }
         }
       </script>
       <!--CHỌN TGIAN ĐỂ HIỂN THỊ THÔNG TIN-->
       <script>
         let yearInput, monthInput;
         const confirmbutton = document.getElementById("confirm");
-       
+
         confirmbutton.addEventListener("click", function (e) {
-        e.preventDefault();
-        monthInput = document.getElementById("month").value;
-        yearInput = document.getElementById("year").value;
+          e.preventDefault();
+          monthInput = document.getElementById("month").value;
+          yearInput = document.getElementById("year").value;
           // 2. Kiểm tra xem người dùng đã chọn chưa
           if (!monthInput || !yearInput) {
             alert("Vui lòng chọn đầy đủ Tháng và Năm!");
