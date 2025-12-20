@@ -15,18 +15,27 @@ res.json({ status: 'success', data: rows });
 };
 // lấy món bán chạy nhất trong tháng.
 exports.getBestSeller = (req, res) => {
-const sql = `
-SELECT menu_name
-FROM order_items
-GROUP BY menu_name
-ORDER BY SUM(quantity) DESC
-LIMIT 1
-`;
-db.query(sql, (err, rows) => {
-if (err) return res.status(500).json({ message: 'Lỗi' });
-res.json({ status: 'success', data: rows[0] });
-});
+  const sql = `
+    SELECT m.name
+    FROM order_items oi
+    JOIN menu m ON oi.menu_id = m.id
+    GROUP BY m.name
+    ORDER BY SUM(oi.quantity) DESC
+    LIMIT 1
+  `;
+  db.query(sql, (err, rows) => {
+    if (err) return res.status(500).json({ message: 'Lỗi lấy món bán chạy' });
+
+    if (rows.length === 0) return res.json({ status: 'success', data: null });
+
+    res.json({
+      status: 'success',
+      data: rows[0].name  
+    });
+  });
 };
+
+
 // tổng doanh thu của cả tháng nha
 exports.getMonthRevenue = (req, res) => {
   const { month, year } = req.query;

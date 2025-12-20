@@ -56,17 +56,6 @@ exports.getCurrentOrder = (req, res) => {
   });
 };
 
-exports.removeItem = (req, res) => {
-  const { cartId } = req.query;
-  const { menuId } = req.params;
-  if (!carts[cartId]) {
-    return res.status(404).json({ message: 'Cart không tồn tại' });
-  }
-  carts[cartId].items = carts[cartId].items.filter(
-    i => i.menuId != menuId
-  );
-  res.json({ status: 'success' });
-};
 
 exports.setTableNumber = (req, res) => {
   const { cartId, tableNumber } = req.body;

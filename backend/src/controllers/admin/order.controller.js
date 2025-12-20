@@ -1,8 +1,6 @@
 const db = require('../../config/database');
-const calculateTotal = require('../../utils/calculateTotal');
-const clientOrder = require('../client/order.controller');
 
-exports.getOrders = (req, res) => {
+exports.getPendingOrders = (req, res) => {
   const sql = `
     SELECT
       id,
@@ -11,12 +9,14 @@ exports.getOrders = (req, res) => {
       total_price,
       payment_status
     FROM orders
-    ORDER BY order_date DESC
+    WHERE order_status = 'pending'
+    ORDER BY order_date ASC
   `;
+
   db.query(sql, (err, results) => {
     if (err) {
       console.error(err);
-      return res.status(500).json({ message: 'Lỗi lấy danh sách đơn' });
+      return res.status(500).json({ message: 'Lỗi lấy đơn pending' });
     }
 
     res.json({
@@ -26,68 +26,87 @@ exports.getOrders = (req, res) => {
   });
 };
 
-exports.confirmOrder = (req, res) => {
-  const { tableNumber, paymentStatus } = req.body;
-
-  const items = clientOrder._getCart(tableNumber);
-  if (!items || items.length === 0) {
-    return res.status(400).json({ message: 'Không có đơn' });
-  }
-
-  const totalPrice = calculateTotal(items);
-
-  const orderSql = `
-    INSERT INTO orders (
-      table_number,
-      order_date,
-      total_price,
-      payment_status,
-      order_status
-    )
-    VALUES (?, NOW(), ?, ?, 'confirmed')
+exports.getOrderItems = (req, res) => {
+  const { orderId } = req.params;
+  const sql = `
+    SELECT
+      id,
+      menu_name,
+      quantity,
+      price
+    FROM order_items
+    WHERE order_id = ?
+    ORDER BY id ASC
   `;
-  db.query(orderSql, [tableNumber, totalPrice, paymentStatus], (err, result) => {
+  db.query(sql, [orderId], (err, results) => {
     if (err) {
       console.error(err);
-      return res.status(500).json({ message: 'Lỗi tạo đơn hàng' });
+      return res.status(500).json({ message: 'Lỗi lấy chi tiết đơn' });
     }
 
-    const orderId = result.insertId;
+    const items = results.map((item, index) => ({
+      stt: index + 1,
+      name: item.menu_name,
+      quantity: item.quantity,
+      price: item.price
+    }));
 
-    const orderItems = items.map(item => [
+    res.json({
       orderId,
-      item.menuName,
-      item.quantity,
-      item.price
-    ]);
-
-    const orderItemSql = `
-      INSERT INTO order_items (order_id, menu_name, quantity, price)
-      VALUES ?
-    `;
-    db.query(orderItemSql, [orderItems], (err) => {
-      if (err) {
-        console.error(err);
-        return res.status(500).json({ message: 'Lỗi tạo chi tiết đơn' });
-      }
-
-      clientOrder._clearCart(tableNumber);
-
-      res.json({
-        status: 'success',
-        orderId,
-        order_status: 'confirmed'
-      });
+      items
     });
   });
 };
 
+exports.confirmOrder = (req, res) => {
+  const { orderId } = req.params;
+
+  const sql = `
+    UPDATE orders
+    SET order_status = 'confirmed'
+    WHERE id = ? AND order_status = 'pending'
+  `;
+
+  db.query(sql, [orderId], (err, result) => {
+    if (err) {
+      console.error(err);
+      return res.status(500).json({ message: 'Lỗi xác nhận đơn' });
+    }
+
+    if (result.affectedRows === 0) {
+      return res.status(400).json({ message: 'Đơn không tồn tại hoặc đã xử lý' });
+    }
+
+    res.json({
+      status: 'success',
+      orderId,
+      order_status: 'confirmed'
+    });
+  });
+};
 
 exports.cancelOrder = (req, res) => {
-  const { tableNumber } = req.body;
-  clientOrder._clearCart(tableNumber);
-  res.json({
-    status: 'success',
-    order_status: 'canceled'
+  const { orderId } = req.params;
+  const sql = `
+    UPDATE orders
+    SET order_status = 'canceled'
+    WHERE id = ? AND order_status = 'pending'
+  `;
+
+  db.query(sql, [orderId], (err, result) => {
+    if (err) {
+      console.error(err);
+      return res.status(500).json({ message: 'Lỗi hủy đơn' });
+    }
+
+    if (result.affectedRows === 0) {
+      return res.status(400).json({ message: 'Đơn không tồn tại hoặc đã xử lý' });
+    }
+
+    res.json({
+      status: 'success',
+      orderId,
+      order_status: 'canceled'
+    });
   });
 };
