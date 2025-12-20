@@ -62,31 +62,41 @@
 
         // Hàm 1: Tải và Hiển thị TẤT CẢ ĐƠN HÀNG (loadOrders)
         function loadOrders() {
-          fetch("http://api/order")
+          fetch("http://localhost:3000/api/admin/order/pending")
             .then((res) => res.json())
-            .then((data) => {
+            .then((res) => {
+              const order = res.data;
               mainTableBody.innerHTML = ""; //làm sạch bảng trc khi cập nhật đơn mới
-              if (data.length == 0) {
+              if (!order || order.length === 0) {
                 alert("Không có đơn hàng nào cần xử lý");
                 return;
               }
 
-              data.forEach((item) => {
+              order.forEach((item) => {
+                const paymentStatusText =
+                  item.payment_status === "paid"
+                    ? "Đã thanh toán"
+                    : "Thanh toán sau";
+                const paymentClass =
+                  item.payment_status === "paid"
+                    ? "status-paid"
+                    : "status-unpaid";
                 const row = document.createElement("tr");
                 row.innerHTML = `
-                <td>${item.iddon}</td>
-                <td>${item.idban}</td>
-                <td>${item.date}</td>
-                <td>${item.price || "0"}</td>
+                <td>${item.id}</td>
+                <td>${item.table_number}</td>
+                <td>${new Date(item.order_date).toLocaleDateString(
+                  "vi-VN"
+                )}</td>                <td>${item.total_price || "0"}</td>
                 <td><a href="#" class="chitietbutton" data-id="${
-                  item.iddon
+                  item.id
                 }">chi tiết đơn</a></td>
-                <td>${item.pricestatus}</td>
+                <td><span class="${paymentClass}">${paymentStatusText}</span></td>
                 <td><button class="confirm" data-id="${
-                  item.iddon
+                  item.id
                 }">Xác nhận</button>
                   <button class="cancel" data-id="${
-                    item.iddon
+                    item.id
                   }">Hủy đơn</button></td>`;
                 mainTableBody.appendChild(row);
               });
@@ -105,21 +115,24 @@
           const modalTableBody = modalElement.querySelector("#chitiet"); // tbody của bảng chi tiết
 
           // Gọi API chi tiết đơn hàng theo orderId
-          fetch(`http://api/order_detail/${orderId}`)
+          fetch(`http://localhost:3000/api/admin/order/${orderId}/items`)
             .then((res) => res.json())
             .then((data) => {
               modalTableBody.innerHTML = "";
+              const items = data.items;
 
-              if (Array.isArray(data) && data.length > 0) {
-                data.forEach((item, index) => {
+              if (Array.isArray(items) && items.length > 0) {
+                items.forEach((item, index) => {
                   const row = document.createElement("tr");
                   //theo cấu trúc bảng chi tiết (STT, Tên món, Số lượng, Giá)
                   row.innerHTML = `
                     <td>${index + 1}</td>
                     <td>${item.name}</td>
                     <td>${item.quantity || 1}</td>
-                    <td>${item.price || "0"}</td>
-                `;
+                    <td>${new Intl.NumberFormat("vi-VN").format(
+                      item.price
+                    )} đ</td>                `;
+
                   modalTableBody.appendChild(row);
                 });
               } else {
@@ -134,31 +147,37 @@
 
         // Hàm 3: Xử lý Xác nhận/Hủy đơn hàng (updateOrderStatus)
         function updateOrderStatus(row, orderId, status) {
-          const actionName = status === "confirm" ? "XÁC NHẬN" : "HỦY";
+          // status nhận vào là "confirm" hoặc "cancel"
+          const actionLabel = status === "confirm" ? "XÁC NHẬN" : "HỦY";
 
           if (
             !confirm(
-              `Bạn có chắc chắn muốn ${actionName} đơn hàng #${orderId} không?`
+              `Bạn có chắc chắn muốn ${actionLabel} đơn hàng #${orderId} không?`
             )
           ) {
             return;
           }
 
-          fetch(`http://api/order/update_status/${orderId}`, {
-            method: "POST",
+          // Khai báo URL khớp với Route: /:orderId/confirm hoặc /:orderId/cancel
+          const pthuc = `http://localhost:3000/api/admin/order/${orderId}/${status}`;
+
+          fetch(pthuc, {
+            method: "PUT", // PHẢI ĐỔI THÀNH PUT
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ status: status }),
+            body: JSON.stringify({}),
           })
             .then((res) => res.json())
             .then((data) => {
-              alert(`${actionName} đơn hàng #${orderId} thành công!`);
-              row.remove(); // Xóa dòng khỏi UI
+              if (data.status === "success") {
+                alert(`${actionLabel} đơn hàng #${orderId} thành công!`);
+                row.remove(); // Xóa dòng khỏi bảng "Chờ xử lý"
+              } else {
+                alert("Thông báo: " + data.message);
+              }
             })
             .catch((err) => {
-              console.error("Lỗi cập nhật trạng thái:", err);
-              alert(
-                `LỖI: Không thể ${actionName.toLowerCase()} đơn hàng #${orderId}.`
-              );
+              console.error("Lỗi:", err);
+              alert("Lỗi kết nối server!");
             });
         }
 
@@ -183,7 +202,9 @@
             );
 
             closeButton.addEventListener("click", hideModal);
-
+            pageElements = Array.from(document.body.children).filter(
+              (child) => child !== modalElement && child.tagName !== "SCRIPT"
+            );
             // 3. Gán sự kiện click cho bảng
             mainTableBody.addEventListener("click", function (e) {
               const target = e.target;
@@ -211,7 +232,7 @@
           .catch((err) => console.error("Lỗi khi tải Modal:", err));
       </script>
 
-      <!--chèn sidebar-->
+      <!--sidebar-->
       <script>
         // Hàm mở/đóng Sidebar
         function openSidebar() {
