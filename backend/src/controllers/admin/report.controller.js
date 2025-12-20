@@ -1,40 +1,43 @@
-const db = require('../../config/database');
-// lấy hiển thị doanh thu theo ngày trong tháng 
+const db = require("../../config/database");
+// lấy hiển thị doanh thu theo ngày trong tháng
 exports.getRevenue = (req, res) => {
-const { month, year } = req.query;
-const sql = `
+  const { month, year } = req.query;
+  const sql = `
 SELECT DAY(order_date) day, SUM(total_price) total
 FROM orders
 WHERE MONTH(order_date)=? AND YEAR(order_date)=?  AND order_status = 'confirmed'
 GROUP BY DAY(order_date)
 `;
-db.query(sql, [month, year], (err, rows) => {
-if (err) return res.status(500).json({ message: 'Lỗi' });
-res.json({ status: 'success', data: rows });
-});
+  db.query(sql, [month, year], (err, rows) => {
+    if (err) return res.status(500).json({ message: "Lỗi" });
+    res.json({ status: "success", data: rows });
+  });
 };
 // lấy món bán chạy nhất trong tháng.
 exports.getBestSeller = (req, res) => {
+  const { month, year } = req.query; // Nhận tham số từ frontend
   const sql = `
     SELECT m.name
     FROM order_items oi
     JOIN menu m ON oi.menu_id = m.id
+    JOIN orders o ON oi.order_id = o.id
+    WHERE MONTH(o.order_date) = ? AND YEAR(o.order_date) = ?
     GROUP BY m.name
     ORDER BY SUM(oi.quantity) DESC
     LIMIT 1
   `;
-  db.query(sql, (err, rows) => {
-    if (err) return res.status(500).json({ message: 'Lỗi lấy món bán chạy' });
 
-    if (rows.length === 0) return res.json({ status: 'success', data: null });
+  db.query(sql, [month, year], (err, rows) => {
+    if (err) return res.status(500).json({ message: "Lỗi lấy món bán chạy" });
+
+    if (rows.length === 0) return res.json({ status: "success", data: null });
 
     res.json({
-      status: 'success',
-      data: rows[0].name  
+      status: "success",
+      data: rows[0].name,
     });
   });
 };
-
 
 // tổng doanh thu của cả tháng nha
 exports.getMonthRevenue = (req, res) => {
@@ -48,13 +51,13 @@ exports.getMonthRevenue = (req, res) => {
       AND order_status = 'confirmed'
   `;
   db.query(sql, [month, year], (err, rows) => {
-    if (err) return res.status(500).json({ message: 'Lỗi' });
+    if (err) return res.status(500).json({ message: "Lỗi" });
 
     res.json({
-      status: 'success',
+      status: "success",
       data: {
-        monthTotal: rows[0].month_total 
-      }
+        monthTotal: rows[0].month_total,
+      },
     });
   });
 };
