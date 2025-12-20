@@ -2,19 +2,19 @@ body,
 html {
   padding: 0;
 }
+
 #header {
   display: flex;
   margin-bottom: 4%;
 }
 #header h1 {
-  flex-grow: 1; /* Để h1 chiếm không gian còn lạigiản nở width theo cha */
+  flex-grow: 1; /* Để h1 chiếm không gian còn lại */
   text-align: center;
 }
-
 #table {
   flex-grow: 1;
-  width: 80%;
-  margin: 20px auto; /*căn giữa bảng*/
+  width: 82%;
+  margin: auto; /*căn giữa bảng*/
   border-collapse: collapse;
 }
 #table thead {
@@ -26,10 +26,14 @@ td {
   border: 2px solid black;
   text-align: center;
 }
+
 #s1 {
   padding: 2% 3%;
 }
 /*---CSS CỦA MODAL*/
+#modal table {
+  border-collapse: collapse;
+}
 #modal thead {
   background-color: #cb3232;
   border: 2px solid black;
@@ -42,9 +46,55 @@ td {
 
 #modal.overlay {
   display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1000; /* Luôn nằm trên cùng */
+  justify-content: center;
+  align-items: center;
+  width: 100vw; /* Chiếm hết chiều rộng màn hình */
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.6); /* Màu xám đen trong suốt */
 }
 
 #modal.overlay.open {
-  display: block;
-  background-color: rgba(0, 0, 0, 0.484);
+  display: flex;
+}
+.modal-container {
+  background-color: white;
+  padding: 25px;
+  border-radius: 3px;
+  width: 70%; /* Độ rộng của bảng chi tiết */
+  max-width: 800px; /* Không cho rộng quá trên màn hình lớn */
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+  position: relative;
+}
+
+#modal .modal-container table {
+  width: 100%;
+  margin-top: 15px;
+}
+
+/* Định dạng header của modal (Tiêu đề và nút X) */
+#modal_header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+#modal_header h1 {
+  margin: 0;
+  font-size: 1.5rem;
+}
+
+/* Nút đóng (X) */
+.close_button {
+  font-size: 2rem;
+  color: #333;
+  text-decoration: none;
+}
+
+.close_button:hover {
+  color: #cb3232;
 }
