@@ -2,24 +2,40 @@ document.addEventListener("DOMContentLoaded", () => {
   const BASE_URL = window.API_BASE_URL;
   const foodEl = document.querySelector(".food");
   const cartCountEl = document.querySelector(".cart-count");
+  const tongTienEl = document.querySelector(".tongTien");
   const searchForm = document.querySelector(".search-container form");
   const searchInput = document.querySelector(
     '.search-container input[name="query"]'
   );
+  const paymentModal = new bootstrap.Modal(
+    document.getElementById("paymentModal")
+  );
+  const btnThanhToan = document.getElementById("btn-thanh-toan");
+  const modalTongTien = document.getElementById("modal-tong-tien");
+  const btnDaThanhToan = document.getElementById("btn-da-thanh-toan");
+  const btnTienMat = document.getElementById("btn-tien-mat");
 
   let items = [];
   let cart = JSON.parse(localStorage.getItem("cart") || "{}");
 
-  function updateCartCount() {
-    let total = 0;
-    for (const id in cart) {
-      total += cart[id];
-    }
-    if (cartCountEl) cartCountEl.textContent = total;
-  }
-
   function formatVND(n) {
     return new Intl.NumberFormat("vi-VN").format(n) + " đ";
+  }
+
+  function updateCartCountAndTotal() {
+    let total = 0,
+      totalMoney = 0;
+    for (const id in cart) {
+      total += cart[id].quantity;
+      totalMoney += cart[id].price * cart[id].quantity;
+    }
+    if (cartCountEl) cartCountEl.textContent = total;
+    if (tongTienEl)
+      tongTienEl.textContent = "TỔNG TIỀN: " + formatVND(totalMoney);
+  }
+
+  function saveCart() {
+    localStorage.setItem("cart", JSON.stringify(cart));
   }
 
   function makeCard(item) {
@@ -51,39 +67,28 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   async function loadItems() {
-    const res = await fetch(`${BASE_URL}/api/menu/client`);
+    const res = await fetch("http://localhost:3000/api/client/menu/");
     const data = await res.json();
     return data.data;
   }
 
-  function saveCart() {
-    localStorage.setItem("cart", JSON.stringify(cart));
-  }
-
   function filterAndRender(q) {
     let query = "";
-    if (q) {
-      query = q.trim().toLowerCase();
-    }
+    if (q) query = q.trim().toLowerCase();
     if (!query) {
-      return render(items);
+      render(items);
+      return;
     }
-    const filtered = [];
-    for (let i = 0; i < items.length; i++) {
-      const item = items[i];
-      const itemName = (item.name || "").toLowerCase();
-      if (itemName.includes(query)) {
-        filtered.push(item);
-      }
-    }
+    const filtered = items.filter((item) =>
+      (item.name || "").toLowerCase().includes(query)
+    );
     render(filtered);
   }
 
   foodEl &&
-    foodEl.addEventListener("click", async (ev) => {
+    foodEl.addEventListener("click", (ev) => {
       const btn = ev.target.closest("button");
       if (!btn) return;
-
       if (btn.classList.contains("qty-btn")) {
         const action = btn.dataset.action;
         const qtyInput = btn.parentElement.querySelector(".qty-input");
@@ -93,15 +98,23 @@ document.addEventListener("DOMContentLoaded", () => {
         qtyInput.value = v;
         return;
       }
-
       if (btn.classList.contains("add")) {
         const card = btn.closest(".card");
         if (!card) return;
         const id = card.dataset.id;
+        const itemInfo = items.find((item) => String(item.id) === String(id));
         const qty = parseInt(card.querySelector(".qty-input").value, 10) || 1;
-        cart[id] = (cart[id] || 0) + qty;
+        if (cart[id]) {
+          cart[id].quantity += qty;
+        } else {
+          cart[id] = {
+            name: itemInfo.name,
+            price: itemInfo.price,
+            quantity: qty,
+          };
+        }
         saveCart();
-        updateCartCount();
+        updateCartCountAndTotal();
         const old = btn.textContent;
         btn.textContent = "Đã thêm";
         setTimeout(() => (btn.textContent = old), 700);
@@ -113,14 +126,90 @@ document.addEventListener("DOMContentLoaded", () => {
       e.preventDefault();
       filterAndRender(searchInput.value);
     });
+
   searchInput &&
     searchInput.addEventListener("input", (e) =>
       filterAndRender(e.target.value)
     );
 
+  // Thanh toán
+  btnThanhToan &&
+    btnThanhToan.addEventListener("click", () => {
+      let totalPrice = 0;
+      for (const id in cart) totalPrice += cart[id].price * cart[id].quantity;
+      if (totalPrice === 0) return alert("Giỏ hàng trống!");
+      modalTongTien.textContent =
+        "Tổng tiền cần thanh toán: " + formatVND(totalPrice);
+      paymentModal.show();
+    });
+
+  async function guiDonHang(phuongThuc) {
+    const tableNumber = document.getElementById("table-number").value;
+    if (!tableNumber) return alert("Vui lòng nhập số bàn!");
+    if (Object.keys(cart).length === 0) return alert("Giỏ hàng trống!");
+    const itemsOrder = [];
+    let tong = 0;
+
+    for (const id in cart) {
+      // Ép kiểu số cho price và quantity ngay từ đầu để tránh NaN
+      const price = Number(cart[id].price);
+      const quantity = Number(cart[id].quantity);
+
+      if (isNaN(price) || isNaN(quantity)) continue; // Bỏ qua nếu dữ liệu lỗi
+
+      itemsOrder.push({
+        menuId: parseInt(id),
+        name: cart[id].name,
+        quantity: quantity,
+        price: price,
+      });
+
+      tong += price * quantity;
+    }
+
+    // Kiểm tra cuối cùng trước khi gửi
+    if (isNaN(tong) || tong <= 0) return alert("Lỗi tính toán tổng tiền!");
+
+    const orderData = {
+      tableNumber: tableNumber,
+      paymentStatus: phuongThuc === "Tiền mặt" ? "unpaid" : "paid", // Khớp với ENUM ('paid','unpaid') trong DB của bạn
+      items: itemsOrder,
+      totalAmount: tong,
+    };
+    try {
+      const response = await fetch("http://localhost:3000/api/client/order/", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(orderData),
+      });
+      if (response.ok) {
+        alert("Đặt hàng thành công!");
+        cart = {};
+        saveCart();
+        updateCartCountAndTotal();
+        document.getElementById("table-number").value = "";
+        paymentModal.hide();
+      } else {
+        alert("Máy chủ bận, thử lại sau!");
+      }
+    } catch (error) {
+      alert("Lỗi mạng hoặc máy chủ!");
+    }
+  }
+
+  btnDaThanhToan &&
+    btnDaThanhToan.addEventListener("click", () => {
+      guiDonHang("Chuyển khoản QR");
+    });
+  btnTienMat &&
+    btnTienMat.addEventListener("click", () => {
+      guiDonHang("Tiền mặt");
+    });
+
+  // Khởi động
   (async function init() {
     items = await loadItems();
     render(items);
-    updateCartCount();
+    updateCartCountAndTotal();
   })();
 });
