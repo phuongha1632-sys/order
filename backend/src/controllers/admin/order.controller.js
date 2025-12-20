@@ -1,4 +1,4 @@
-const db = require('../../config/database');
+const db = require("../../config/database");
 
 exports.getPendingOrders = (req, res) => {
   const sql = `
@@ -15,11 +15,11 @@ exports.getPendingOrders = (req, res) => {
   db.query(sql, (err, results) => {
     if (err) {
       console.error(err);
-      return res.status(500).json({ message: 'Lỗi lấy đơn pending' });
+      return res.status(500).json({ message: "Lỗi lấy đơn pending" });
     }
     res.json({
-      status: 'success',
-      data: results
+      status: "success",
+      data: results,
     });
   });
 };
@@ -41,19 +41,19 @@ exports.getOrderItems = (req, res) => {
   db.query(sql, [orderId], (err, results) => {
     if (err) {
       console.error(err);
-      return res.status(500).json({ message: 'Lỗi lấy chi tiết đơn' });
+      return res.status(500).json({ message: "Lỗi lấy chi tiết đơn" });
     }
 
     const items = results.map((item, index) => ({
       stt: index + 1,
-      name: item.name,     
+      name: item.name,
       quantity: item.quantity,
-      price: item.price
+      price: item.price,
     }));
 
     res.json({
       orderId,
-      items
+      items,
     });
   });
 };
@@ -70,17 +70,19 @@ exports.confirmOrder = (req, res) => {
   db.query(sql, [orderId], (err, result) => {
     if (err) {
       console.error(err);
-      return res.status(500).json({ message: 'Lỗi xác nhận đơn' });
+      return res.status(500).json({ message: "Lỗi xác nhận đơn" });
     }
 
     if (result.affectedRows === 0) {
-      return res.status(400).json({ message: 'Đơn không tồn tại hoặc đã xử lý' });
+      return res
+        .status(400)
+        .json({ message: "Đơn không tồn tại hoặc đã xử lý" });
     }
 
     res.json({
-      status: 'success',
+      status: "success",
       orderId,
-      order_status: 'confirmed'
+      order_status: "confirmed",
     });
   });
 };
@@ -96,17 +98,19 @@ exports.cancelOrder = (req, res) => {
   db.query(sql, [orderId], (err, result) => {
     if (err) {
       console.error(err);
-      return res.status(500).json({ message: 'Lỗi hủy đơn' });
+      return res.status(500).json({ message: "Lỗi hủy đơn" });
     }
 
     if (result.affectedRows === 0) {
-      return res.status(400).json({ message: 'Đơn không tồn tại hoặc đã xử lý' });
+      return res
+        .status(400)
+        .json({ message: "Đơn không tồn tại hoặc đã xử lý" });
     }
 
     res.json({
-      status: 'success',
+      status: "success",
       orderId,
-      order_status: 'canceled'
+      order_status: "canceled",
     });
   });
 };
