@@ -6,13 +6,14 @@ html {
 
 #s1 {
   min-height: 100vh;
-  padding: 3% 3% 12% 3%;
+  padding: 1% 0% 5% 3%;
   display: flex;
   gap: 20px;
   flex-direction: column; /* Xếp các phần tử con theo chiều dọc (trên-dưới) */
 }
 h1 {
   text-align: center;
+  margin-top: 5px;
 }
 #frame2 {
   overflow-y: auto;
@@ -51,24 +52,33 @@ select {
   border-radius: 3px;
   font-weight: bold;
   font-size: 18px;
-  margin-left: 461%;
+  margin-left: 640px;
 }
 #confirm:hover {
   background-color: rgb(72, 164, 255);
   box-shadow: 3px 4px 12px rgba(0, 0, 0, 0.555);
 }
 #chart {
+  flex: 2; /* Chiếm 2 phần diện tích (bên trái) */
+  max-width: 58%; /* Không cho biểu đồ quá to lấn át chữ */
+  height: 500px; /* Chiều cao vừa vặn để nhìn */
 }
 #summary {
+  padding-bottom: 200px;
+  flex: 1; /* Chiếm 1 phần diện tích (bên phải) */
+  font-size: 25px; /* Cho chữ to rõ ràng */
 }
 
 #frame1 {
   display: flex;
+  flex-direction: row; /* Đảm bảo nằm ngang hàng */
+  height: auto;
   height: 40vh;
   width: 80%;
-  gap: 30px;
+  gap: 88px;
   margin: auto;
-  justify-content: center; /* Căn giữa các item theo chiều ngang */
+  padding: 0;
+  justify-content: space-between; /* Căn giữa các item theo chiều ngang */
   align-items: center;
 }
 
