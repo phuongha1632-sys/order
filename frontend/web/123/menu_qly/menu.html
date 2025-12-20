@@ -85,7 +85,7 @@
         const mainTableBody1 = document.getElementById("main_table_body");
 
         // gửi request lấy menu về backend
-        fetch("http://localhost:3000/api/menu/admin")
+        fetch("http://localhost:3000/api/admin/menu/")
           .then((response) => response.json()) // chuyển response về JS object để frontend đọc
           .then((result) => {
             // Xóa bảng cũ
@@ -207,7 +207,7 @@
 
               if (currentFoodId) {
                 // SỬA (PUT)
-                fetch(`http://localhost:3000/api/menu/${currentFoodId}`, {
+                fetch(`http://localhost:3000/api/admin/menu/${currentFoodId}`, {
                   method: "PUT",
                   headers: { "Content-Type": "application/json" },
                   body: JSON.stringify(payload),
@@ -228,7 +228,7 @@
                   });
               } else {
                 // THÊM (POST)
-                fetch("http://localhost:3000/api/menu", {
+                fetch("http://localhost:3000/api/admin/menu/", {
                   method: "POST",
                   headers: { "Content-Type": "application/json" },
                   body: JSON.stringify(payload),
@@ -298,10 +298,10 @@
                   alert("Không tìm thấy ID món ăn để xóa.");
                   return;
                 }
-
+                
                 if (confirm(`Bạn có chắc chắn muốn xóa món: ${foodName}?`)) {
-                  const apiUrl = `http://localhost:3000/api/menu/${foodIdToDelete}`;
-
+                  const apiUrl = `http://localhost:3000/api/admin/menu/${foodIdToDelete}`;
+                  
                   fetch(apiUrl, { method: "DELETE" })
                     .then((res) => res.json())
                     .then((data) => {
