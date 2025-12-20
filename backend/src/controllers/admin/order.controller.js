@@ -12,13 +12,11 @@ exports.getPendingOrders = (req, res) => {
     WHERE order_status = 'pending'
     ORDER BY order_date ASC
   `;
-
   db.query(sql, (err, results) => {
     if (err) {
       console.error(err);
       return res.status(500).json({ message: 'Lỗi lấy đơn pending' });
     }
-
     res.json({
       status: 'success',
       data: results
@@ -29,15 +27,17 @@ exports.getPendingOrders = (req, res) => {
 exports.getOrderItems = (req, res) => {
   const { orderId } = req.params;
   const sql = `
-    SELECT
-      id,
-      menu_name,
-      quantity,
-      price
-    FROM order_items
-    WHERE order_id = ?
-    ORDER BY id ASC
+    SELECT 
+      oi.id,
+      m.name,
+      oi.quantity,
+      oi.price
+    FROM order_items oi
+    JOIN menu m ON oi.menu_id = m.id
+    WHERE oi.order_id = ?
+    ORDER BY oi.id ASC
   `;
+
   db.query(sql, [orderId], (err, results) => {
     if (err) {
       console.error(err);
@@ -46,7 +46,7 @@ exports.getOrderItems = (req, res) => {
 
     const items = results.map((item, index) => ({
       stt: index + 1,
-      name: item.menu_name,
+      name: item.name,     
       quantity: item.quantity,
       price: item.price
     }));
