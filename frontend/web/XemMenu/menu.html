@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="menu.css" />
     <link
       href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
       rel="stylesheet"
@@ -30,7 +30,7 @@
         </div>
         <!-- Khối giỏ hàng -->
         <div class="cart-icon-container">
-          <a href="/cart" class="cart-link">
+          <a href="cart.html" class="cart-link">
             <i class="fa-solid fa-cart-shopping"></i>
             <span class="cart-count">0</span>
           </a>
@@ -72,6 +72,37 @@
           </div>
         </div>
       </div>
+
+      <div class="footer">
+        <h6 class="tongTien"> TỔNG TIỀN </h6>
+        <button type="button" class="pay-btn pay" id="btn-thanh-toan">THANH TOÁN</button>
+
+        <div class="modal fade" id="paymentModal" tabindex="-1" aria-hidden="true">
+          <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title">Quét mã QR để thanh toán</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body text-center">
+                <div class="mb-3 px-4">
+                  <label for="table-number" class="form-label fw-bold">Nhập số bàn của bạn:</label>
+                  <input type="number" class="form-control text-center" id="table-number" placeholder="Ví dụ: 5" min="1">
+                </div>
+                <img src="https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=ThanhToanNhaHang" 
+                    alt="QR Code" class="img-fluid mb-3" style="max-width: 250px;">
+                <p class="fw-bold text-danger" id="modal-tong-tien"></p>
+                <p class="text-muted small">Sau khi thanh toán bằng mã QR vui lòng nhấn vào Đã thanh toán bằng QR. Nếu bạn thanh toán sau bằng tiền mặt vui lòng nhấn vào Thanh toán bằng tiền mặt.</p>
+              </div>
+              <div class="modal-footer justify-content-center">
+                <button type="button" class="btn btn-success" id="btn-da-thanh-toan">Đã thanh toán bằng QR</button>
+                <button type="button" class="btn btn-secondary" id="btn-tien-mat">Thanh toán bằng tiền mặt</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
     </div>
 
     <script
