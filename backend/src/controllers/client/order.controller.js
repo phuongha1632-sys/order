@@ -1,73 +1,45 @@
-const calculateTotal = require('../../utils/calculateTotal');
-const crypto = require('crypto');
-const carts = {};
+const db = require('../../config/database');
 
-exports.createCart = (req, res) => {
-  const cartId = crypto.randomUUID();
+exports.getOrder = (req, res) => {
+  const { orderId } = req.params;
+  const orderSql = `
+    SELECT id, table_number, order_status, payment_status, total_amount, order_date
+    FROM orders
+    WHERE id = ?
+  `;
+  db.query(orderSql, [orderId], (err, orderResults) => {
+    if (err) return res.status(500).json({ message: 'Lỗi lấy đơn hàng' });
+    if (orderResults.length === 0) return res.status(404).json({ message: 'Đơn không tồn tại' });
+    const order = orderResults[0];
 
-  carts[cartId] = {
-    items: [],
-    tableNumber: null
-  };
+    const itemsSql = `
+      SELECT m.name, oi.quantity, oi.price
+      FROM order_items oi
+      JOIN menu m ON oi.menu_id = m.id
+      WHERE oi.order_id = ?
+      ORDER BY oi.id ASC
+    `;
+    db.query(itemsSql, [orderId], (err, itemsResults) => {
+      if (err) return res.status(500).json({ message: 'Lỗi lấy chi tiết đơn' });
+      const items = itemsResults.map((item, index) => ({
+        stt: index + 1,
+        name: item.name,
+        quantity: item.quantity,
+        price: item.price
+      }));
 
-  res.json({
-    status: 'success',
-    cartId
+      res.json({
+        status: 'success',
+        order: {
+          id: order.id,
+          table_number: order.table_number,
+          order_status: order.order_status,
+          payment_status: order.payment_status,
+          total_amount: order.total_amount,
+          order_date: order.order_date,
+          items
+        }
+      });
+    });
   });
 };
-
-exports.addItem = (req, res) => {
-  const { cartId, menuId, menuName, price, quantity } = req.body;
-
-  if (!carts[cartId]) {
-    return res.status(404).json({ message: 'Cart không tồn tại' });
-  }
-
-  carts[cartId].items.push({
-    menuId,
-    menuName,
-    price,
-    quantity
-  });
-
-  res.json({ status: 'success' });
-};
-
-exports.getCurrentOrder = (req, res) => {
-  const { cartId } = req.query;
-  if (!carts[cartId]) {
-    return res.status(404).json({ message: 'Cart không tồn tại' });
-  }
-  const items = carts[cartId].items;
-  const displayItems = items.map((item, index) => ({
-    stt: index + 1,
-    menuName: item.menuName,
-    quantity: item.quantity,
-    price: item.price
-  }));
-  const totalBill = items.reduce(
-    (sum, item) => sum + item.price * item.quantity,
-    0
-  );
-  res.json({
-    status: 'success',
-    items: displayItems,
-    totalBill
-  });
-};
-
-
-exports.setTableNumber = (req, res) => {
-  const { cartId, tableNumber } = req.body;
-  if (!carts[cartId]) {
-    return res.status(404).json({ message: 'Cart không tồn tại' });
-  }
-  carts[cartId].tableNumber = tableNumber;
-  res.json({
-    status: 'success',
-    tableNumber
-  });
-};
-
-exports._getCart = cartId => carts[cartId];
-exports._clearCart = cartId => delete carts[cartId];
