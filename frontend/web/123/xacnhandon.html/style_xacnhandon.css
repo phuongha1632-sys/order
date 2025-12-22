@@ -26,7 +26,12 @@ td {
   border: 2px solid black;
   text-align: center;
 }
-
+#table_body td:nth-child(1),
+#table_body td:nth-child(2),
+#table_body td:nth-child(3),
+#table_body td:nth-child(4) {
+  font-weight: normal;
+}
 #s1 {
   padding: 2% 3%;
 }
@@ -48,6 +53,12 @@ td {
 }
 .cancel {
   background-color: red;
+}
+.status-paid {
+  color: grey;
+}
+.status-unpaid {
+  color: red;
 }
 /*---CSS CỦA MODAL*/
 #modal table {
