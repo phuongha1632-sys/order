@@ -163,7 +163,7 @@
           }
 
           fetch(`http://localhost:3000/api/admin/order/${orderId}/${status}`, {
-            method: "PUT", // PHẢI ĐỔI THÀNH PUT
+            method: "PUT",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({}), //stringtify{}, nhưng đã gửi status và id ở api
           })
