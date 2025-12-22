@@ -22,7 +22,7 @@ html {
 }
 #table th,
 td {
-  height: 35px;
+  height: 40px;
   border: 2px solid black;
   text-align: center;
 }
@@ -37,6 +37,18 @@ td {
 #table_body tr:nth-child(even) {
   background-color: rgb(230, 228, 228);
 }
+.confirm:hover {
+  background-color: rgb(128, 236, 128);
+}
+.confirm {
+  background-color: rgb(65, 208, 65);
+}
+.cancel:hover {
+  background-color: rgb(246, 98, 98);
+}
+.cancel {
+  background-color: red;
+}
 /*---CSS CỦA MODAL*/
 #modal table {
   border-collapse: collapse;
@@ -45,7 +57,6 @@ td {
   background-color: #cb3232;
   border: 2px solid black;
 }
-
 #modal tbody {
   border-bottom: 1px solid black;
   border-top: 1px solid black;
