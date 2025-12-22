@@ -61,33 +61,39 @@
         let pageElements = [];
 
         // Hàm 1: Tải và Hiển thị TẤT CẢ ĐƠN HÀNG (loadOrders)
-        function loadOrders() {
-          fetch("http://localhost:3000/api/admin/order/pending")
-            .then((res) => res.json())
-            .then((res) => {
-              const order = res.data;
-              mainTableBody.innerHTML = ""; //làm sạch bảng trc khi cập nhật đơn mới
-              if (!order || order.length === 0) {
-                alert("Không có đơn hàng nào cần xử lý");
-                return;
-              }
+        async function loadOrders() {
+          try {
+            const res = await fetch(
+              "http://localhost:3000/api/admin/order/pending"
+            );
+            const resJson = await res.json(); //chuyển sang Object JS để fe tương tác
+            const orders = resJson.data;
 
-              order.forEach((item) => {
-                const paymentStatusText =
-                  item.payment_status === "paid"
-                    ? "Đã thanh toán"
-                    : "Thanh toán sau";
-                const paymentClass =
-                  item.payment_status === "paid"
-                    ? "status-paid"
-                    : "status-unpaid";
-                const row = document.createElement("tr");
-                row.innerHTML = `
+            mainTableBody.innerHTML = ""; //làm sạch bảng trc khi cập nhật đơn mới
+            if (!orders || orders.length === 0) {
+              mainTableBody.innerHTML =
+                '<tr><td colspan="7" style="text-align:center;">Không có đơn hàng nào cần xử lý</td></tr>';
+              return;
+            }
+
+            orders.forEach((item) => {
+              const paymentStatusText =
+                item.payment_status === "paid"
+                  ? "Đã thanh toán"
+                  : "Thanh toán sau";
+              const paymentClass =
+                item.payment_status === "paid"
+                  ? "status-paid"
+                  : "status-unpaid";
+
+              const row = document.createElement("tr");
+              row.innerHTML = `
                 <td>${item.id}</td>
                 <td>${item.table_number}</td>
                 <td>${new Date(item.order_date).toLocaleDateString(
                   "vi-VN"
-                )}</td>                <td>${item.total_price || "0"}</td>
+                )}</td>          
+                <td>${item.total_price || "0"}</td>
                 <td><a href="#" class="chitietbutton" data-id="${
                   item.id
                 }">chi tiết đơn</a></td>
@@ -98,34 +104,33 @@
                   <button class="cancel" data-id="${
                     item.id
                   }">Hủy đơn</button></td>`;
-                mainTableBody.appendChild(row);
-              });
-            })
-            .catch((err) => {
-              console.error("Lỗi khi gửi yêu cầu lấy dữ liệu đơn hàng:", err);
-              alert(
-                "Lỗi kết nối hoặc xử lý dữ liệu khi hiển thị danh sách đơn hàng."
-              );
+              mainTableBody.appendChild(row);
             });
+          } catch (err) {
+            console.error("Lỗi khi gửi yêu cầu lấy dữ liệu đơn hàng:", err);
+            alert(
+              "Lỗi kết nối hoặc xử lý dữ liệu khi hiển thị danh sách đơn hàng."
+            );
+          }
         }
         loadOrders(); //hiển thị thông tin lên bảng chính
 
-        // Hàm 2: Tải và Hiển thị CHI TIẾT ĐƠN HÀNG (loadOrderDetail)
-        function loadOrderDetail(orderId) {
-          const modalTableBody = modalElement.querySelector("#chitiet"); // tbody của bảng chi tiết
+       // Hàm 2: Tải và Hiển thị CHI TIẾT ĐƠN HÀNG (loadOrderDetail)
+        async function loadOrderDetail(orderId) {
+          const modalTableBody = modalElement.querySelector("#chitiet");
+          try {
+            const res = await fetch(
+              `http://localhost:3000/api/admin/order/${orderId}/items`
+            );
+            const data = await res.json();
+            const items = data.items;
 
-          // Gọi API chi tiết đơn hàng theo orderId
-          fetch(`http://localhost:3000/api/admin/order/${orderId}/items`)
-            .then((res) => res.json())
-            .then((data) => {
-              modalTableBody.innerHTML = "";
-              const items = data.items;
-
-              if (Array.isArray(items) && items.length > 0) {
-                items.forEach((item, index) => {
-                  const row = document.createElement("tr");
-                  //theo cấu trúc bảng chi tiết (STT, Tên món, Số lượng, Giá)
-                  row.innerHTML = `
+            modalTableBody.innerHTML = "";
+            if (Array.isArray(items) && items.length > 0) {
+              items.forEach((item, index) => {
+                const row = document.createElement("tr");
+                //theo cấu trúc bảng chi tiết (STT, Tên món, Số lượng, Giá)
+                row.innerHTML = `
                     <td>${index + 1}</td>
                     <td>${item.name}</td>
                     <td>${item.quantity || 1}</td>
@@ -133,38 +138,34 @@
                       item.price
                     )} đ</td>                `;
 
-                  modalTableBody.appendChild(row);
-                });
-              } else {
-                modalTableBody.innerHTML = `<tr><td colspan="4">Không tìm thấy chi tiết món ăn cho đơn hàng #${orderId}.</td></tr>`;
-              }
-            })
-            .catch((err) => {
-              console.error("Lỗi khi tải chi tiết đơn:", err);
-              alert(`Không thể tải chi tiết món ăn cho đơn hàng #${orderId}.`);
-            });
+                modalTableBody.appendChild(row);
+              });
+            } else {
+              modalTableBody.innerHTML = `<tr><td colspan="4">Không tìm thấy chi tiết món ăn cho đơn hàng #${orderId}.</td></tr>`;
+            }
+          } catch (err) {
+            console.error("Lỗi khi tải chi tiết đơn:", err);
+            alert(`Không thể tải chi tiết món ăn cho đơn hàng #${orderId}.`);
+          }
         }
-
+        
         // Hàm 3: Xử lý Xác nhận/Hủy đơn hàng (updateOrderStatus)
         function updateOrderStatus(row, orderId, status) {
           // status nhận vào là "confirm" hoặc "cancel"
-          const actionLabel = status === "confirm" ? "XÁC NHẬN" : "HỦY";
+          const actionLabel = status === "confirm" ? "xác nhận" : "hủy";
 
           if (
             !confirm(
-              `Bạn có chắc chắn muốn ${actionLabel} đơn hàng #${orderId} không?`
+              `Bạn có chắc chắn muốn ${actionLabel} đơn hàng số #${orderId} không?`
             )
           ) {
             return;
           }
 
-          // Khai báo URL khớp với Route: /:orderId/confirm hoặc /:orderId/cancel
-          const pthuc = `http://localhost:3000/api/admin/order/${orderId}/${status}`;
-
-          fetch(pthuc, {
+          fetch(`http://localhost:3000/api/admin/order/${orderId}/${status}`, {
             method: "PUT", // PHẢI ĐỔI THÀNH PUT
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({}),
+            body: JSON.stringify({}), //stringtify{}, nhưng đã gửi status và id ở api
           })
             .then((res) => res.json())
             .then((data) => {
@@ -195,13 +196,9 @@
             document.body.appendChild(modalElement);
 
             // 2. GÁN SỰ KIỆN VÀ THAM CHIẾU
-            closeButton = modalElement.querySelector(".close_button");
-            // Lấy các phần tử trên trang chính để vô hiệu hóa khi modal mở
-            pageElements = Array.from(document.body.children).filter(
-              (child) => child !== modalElement
-            );
-
+            closeButton = modalElement.querySelector(".close_button");            
             closeButton.addEventListener("click", hideModal);
+            // Lấy các phần tử trên trang chính để vô hiệu hóa khi modal mở
             pageElements = Array.from(document.body.children).filter(
               (child) => child !== modalElement && child.tagName !== "SCRIPT"
             );
