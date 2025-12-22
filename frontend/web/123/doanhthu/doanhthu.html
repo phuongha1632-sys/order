@@ -87,7 +87,7 @@
             );
             const resData = await res.json();
             mainTableBody.innerHTML = "";
-            const data = resData.data;
+            const data = resData.data;  //resdata gồm status với data
 
             if (data.length > 0) {
               data.forEach((item) => {
@@ -106,7 +106,7 @@
             } else {
               // Xử lý trường hợp không có dữ liệu
               mainTableBody.innerHTML =
-                '<tr><td colspan="4">Không tìm thấy đơn hàng nào trong tháng.</td></tr>';
+                '<tr><td colspan="2">Không tìm thấy đơn hàng nào trong tháng.</td></tr>';
             }
           } catch (err) {
             console.error("Lỗi khi gửi yêu cầu lấy dữ liệu đơn hàng:", err);
@@ -150,7 +150,7 @@
             const data = resData.data;
 
             // 2. Tính toán số ngày trong tháng để vẽ trục X
-            const daysInMonth = new Date(year, month, 0).getDate();
+            const daysInMonth = new Date(year, month, 0).getDate();  //day=0 là ngày cuối cùng của tháng month(set tự động các tháng thay vì if...)
 
             const labels = [];
             const values = [];
@@ -160,7 +160,7 @@
               labels.push(d); // Thêm ngày vào trục X
 
               // Tìm xem trong dữ liệu từ DB có ngày 'd' này không
-              const found = data.find((item) => item.day === d);
+              const found = data.find((item) => item.day === d);  //.find() duyệt tuần tự từng phần tử trong mảng data.
 
               // Nếu có thì lấy tiền (total), không có thì để là 0
               values.push(found ? found.total : 0);
@@ -204,13 +204,9 @@
             );
             // Ghi vào HTML một lần duy nhất
             right.innerHTML = `
-<p>
-    <i class='bx bx-happy-heart-eyes' style='color: red;   font-size: 40px;
-'></i> 
-    Món bán chạy nhất: <strong>${bestSellerName}</strong>
-  </p>      <p><i class="bx bx-dollar" style='color: #2ecc71;   font-size: 40px;
-'></i> Tổng doanh thu tháng: <strong>${formattedTotal} đ</strong></p>
-    `;
+<p><i class='bx bx-happy-heart-eyes' style='color: red;   font-size: 40px;'></i>Món bán chạy nhất: <strong>${bestSellerName}</strong></p>
+<p><i class="bx bx-dollar" style='color: #2ecc71;   font-size: 40px;'></i> Tổng doanh thu tháng: <strong>${formattedTotal} đ</strong></p>
+            `;
           } catch (err) {
             console.error("Lỗi tải summary:", err);
             right.innerHTML = "<p>Không thể tải thông tin tổng quan.</p>";
