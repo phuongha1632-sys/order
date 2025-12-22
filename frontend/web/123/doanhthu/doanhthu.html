@@ -47,6 +47,7 @@
               <option value="12">Tháng 12</option>
             </select>
           </div>
+          
           <div class="filter-group">
             <label for="year">Năm</label>
             <select id="year">
@@ -59,10 +60,12 @@
               <option value="2028">Năm 2028</option>
             </select>
           </div>
+          
           <div class="filter-group">
             <button id="confirm">Xác nhận</button>
           </div>
         </div>
+        
         <table id="table">
           <thead>
             <tr>
@@ -77,43 +80,43 @@
       <!--Chen tt vao bang chi tiet-->
       <script>
         const mainTableBody = document.getElementById("table_body");
-        function loaddata(month, year) {
-          fetch(
-            `http://localhost:3000/api/admin/report/revenue?month=${month}&year=${year}`
-          )
-            .then((res) => res.json())
-            .then((resData) => {
-              mainTableBody.innerHTML = "";
-              const data = resData.data;
-              if (data.length > 0) {
-                data.forEach((item) => {
-                  const row = document.createElement("tr");
+        async function loaddata(month, year) {
+          try {
+            const res = await fetch(
+              `http://localhost:3000/api/admin/report/revenue?month=${month}&year=${year}`
+            );
+            const resData = await res.json();
+            mainTableBody.innerHTML = "";
+            const data = resData.data;
 
-                  row.innerHTML = `
-<td>${String(item.day).padStart(2, "0")}/${String(month).padStart(
-                    2,
-                    "0"
-                  )}/${year}</td>                  <td>${new Intl.NumberFormat(
-                    "vi-VN"
-                  ).format(item.total)} đ</td>                `;
+            if (data.length > 0) {
+              data.forEach((item) => {
+                const row = document.createElement("tr");
+                row.innerHTML = `<td>${String(item.day).padStart(
+                  2,
+                  "0"
+                )}/${String(month).padStart(2, "0")}/${year}</td>
 
-                  mainTableBody.appendChild(row);
-                });
-              } else {
-                // Xử lý trường hợp không có dữ liệu
-                mainTableBody.innerHTML =
-                  '<tr><td colspan="4">Không tìm thấy đơn hàng nào trong tháng.</td></tr>';
-              }
-            })
-            .catch((err) => {
-              console.error("Lỗi khi gửi yêu cầu lấy dữ liệu đơn hàng:", err);
-              alert(
-                "Lỗi kết nối hoặc xử lý dữ liệu khi hiển thị danh sách đơn hàng."
-              );
-            });
+                  <td>${new Intl.NumberFormat("vi-VN").format(
+                    item.total
+                  )} đ</td>                `;
+
+                mainTableBody.appendChild(row);
+              });
+            } else {
+              // Xử lý trường hợp không có dữ liệu
+              mainTableBody.innerHTML =
+                '<tr><td colspan="4">Không tìm thấy đơn hàng nào trong tháng.</td></tr>';
+            }
+          } catch (err) {
+            console.error("Lỗi khi gửi yêu cầu lấy dữ liệu đơn hàng:", err);
+            alert(
+              "Lỗi kết nối hoặc xử lý dữ liệu khi hiển thị danh sách đơn hàng."
+            );
+          }
         }
       </script>
-
+      
       <!--tải biểu đồ-->
       <script>
         // 1. Khởi tạo biểu đồ trống trước
@@ -137,30 +140,41 @@
         });
 
         // 2. Hàm fetch dữ liệu từ BE
-        function loadChartData(month, year) {
-          fetch(
-            `http://localhost:3000/api/admin/report/revenue?month=${month}&year=${year}`
-          )
-            .then((res) => res.json())
-            .then((resData) => {
-              const data = resData.data; // Lấy mảng từ thuộc tính data
-              const daysInMonth = new Date(year, month, 0).getDate(); // Lấy tổng ngày trong tháng
+       async function loadChartData(month, year) {
+          try {
+            // 1. Chờ lấy dữ liệu từ API
+            const res = await fetch(
+              `http://localhost:3000/api/admin/report/revenue?month=${month}&year=${year}`
+            );
+            const resData = await res.json();
+            const data = resData.data;
 
-              const labels = [];
-              const values = [];
+            // 2. Tính toán số ngày trong tháng để vẽ trục X
+            const daysInMonth = new Date(year, month, 0).getDate();
 
-              for (let d = 1; d <= daysInMonth; d++) {
-                labels.push(d); // Trục X hiện từ 1 đến 30/31
-                const found = data.find((item) => item.day === d);
-                values.push(found ? found.total : 0); // Ngày nào không bán được thì hiện số 0
-              }
+            const labels = [];
+            const values = [];
 
-              myChart.data.labels = labels;
-              myChart.data.datasets[0].data = values;
-              // Vẽ lại biểu đồ với dữ liệu mới
-              myChart.update();
-            })
-            .catch((err) => console.error("Lỗi tải biểu đồ:", err));
+            // 3. Vòng lặp để "lấp đầy" đủ 30 hoặc 31 ngày trên biểu đồ
+            for (let d = 1; d <= daysInMonth; d++) {
+              labels.push(d); // Thêm ngày vào trục X
+
+              // Tìm xem trong dữ liệu từ DB có ngày 'd' này không
+              const found = data.find((item) => item.day === d);
+
+              // Nếu có thì lấy tiền (total), không có thì để là 0
+              values.push(found ? found.total : 0);
+            }
+
+            // 4. Cập nhật dữ liệu mới vào đối tượng biểu đồ (myChart)
+            myChart.data.labels = labels;
+            myChart.data.datasets[0].data = values;
+
+            // 5. Lệnh quan trọng nhất: Vẽ lại biểu đồ lên màn hình
+            myChart.update();
+          } catch (err) {
+            console.error("Lỗi tải biểu đồ:", err);
+          }
         }
       </script>
 
@@ -176,7 +190,7 @@
               ),
               fetch(
                 `http://localhost:3000/api/admin/report/revenue/month?month=${month}&year=${year}`
-              ),
+              ), //đủ cả 2 phản hồi api, mới chạy tiếp xuống dòng dưới
             ]);
 
             const dataBest = await resBest.json();
@@ -203,6 +217,7 @@
           }
         }
       </script>
+      
       <!--CHỌN TGIAN ĐỂ HIỂN THỊ THÔNG TIN-->
       <script>
         let yearInput, monthInput;
