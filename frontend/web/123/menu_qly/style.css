@@ -118,6 +118,10 @@ body {
 /* ----------------------CSS CỦA MODAL------------------------      */
 #modal.overlay {
   position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
   inset: 0;
   display: none;
   align-items: center;
@@ -133,6 +137,8 @@ body {
 .page-disabled {
   pointer-events: none;
   user-select: none;
+  filter: blur(4px);
+  pointer-events: none;
 }
 
 #modal_content {
