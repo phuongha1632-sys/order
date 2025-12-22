@@ -43,7 +43,7 @@ const sqlGet = 'SELECT image FROM menu WHERE id=?';
 db.query(sqlGet, [id], (err, rows) => {
 if (err || rows.length === 0)
 return res.status(404).json({ message: 'Không tìm thấy món' });
-const finalImage = newImage || rows[0].image;
+const finalImage = newImage || image|| rows[0].image;
 const sqlUpdate = `
 UPDATE menu
 SET name=?, price=?, image=?, status=?
