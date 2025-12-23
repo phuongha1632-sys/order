@@ -183,7 +183,7 @@ document.addEventListener("DOMContentLoaded", () => {
         body: JSON.stringify(orderData),
       });
       if (response.ok) {
-        alert("Đặt hàng thành công!");
+        alert("chờ xác nhận!");
         cart = {};
         saveCart();
         updateCartCountAndTotal();
