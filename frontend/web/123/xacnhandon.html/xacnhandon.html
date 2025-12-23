@@ -25,7 +25,7 @@
               <th>NGÀY</th>
               <th>TỔNG TIỀN</th>
               <th>XEM THÔNG TIN</th>
-              <th>THANH TOÁN</th>
+              <th>HÌNH THỨC THANH TOÁN</th>
               <th>XÁC NHẬN</th>
             </tr>
           </thead>
@@ -77,10 +77,7 @@
             }
 
             orders.forEach((item) => {
-              const paymentStatusText =
-                item.payment_status === "paid"
-                  ? "Đã thanh toán"
-                  : "Thanh toán sau";
+              const paymentStatusText = item.payment_status === "paid" ? "Thanh toán QR" : "Tiền mặt";
               const paymentClass =
                 item.payment_status === "paid"
                   ? "status-paid"
