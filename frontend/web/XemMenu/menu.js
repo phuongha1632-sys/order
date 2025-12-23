@@ -189,6 +189,7 @@ document.addEventListener("DOMContentLoaded", () => {
         updateCartCountAndTotal();
         document.getElementById("table-number").value = "";
         paymentModal.hide();
+        location.reload();
       } else {
         alert("Máy chủ bận, thử lại sau!");
       }
